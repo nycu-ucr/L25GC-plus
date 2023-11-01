@@ -1,0 +1,32 @@
+[submodule "NFs/amf"]
+	path = NFs/amf
+	url = https://github.com/nycu-ucr/amf.git
+	branch = l25gc+
+[submodule "NFs/ausf"]
+	path = NFs/ausf
+	url = https://github.com/nycu-ucr/ausf.git
+	branch = l25gc+
+[submodule "NFs/nrf"]
+	path = NFs/nrf
+	url = https://github.com/nycu-ucr/nrf.git
+	branch = l25gc+
+[submodule "NFs/nssf"]
+	path = NFs/nssf
+	url = https://github.com/nycu-ucr/nssf.git
+	branch = l25gc+
+[submodule "NFs/pcf"]
+	path = NFs/pcf
+	url = https://github.com/nycu-ucr/pcf.git
+	branch = l25gc+
+[submodule "NFs/smf"]
+	path = NFs/smf
+	url = https://github.com/nycu-ucr/smf.git
+	branch = l25gc+
+[submodule "NFs/udm"]
+	path = NFs/udm
+	url = https://github.com/nycu-ucr/udm.git
+	branch = l25gc+
+[submodule "NFs/udr"]
+	path = NFs/udr
+	url = https://github.com/nycu-ucr/udr.git
+	branch = l25gc+
