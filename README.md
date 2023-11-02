@@ -1,6 +1,6 @@
 ``` diff
 - We kindly note that L25GC+ is not yet completely ready because the installation script needs some refinement.
-- Please stay tuned.
+- Please stay tuned for an official release from us.
 ```
 
 # L25GC+: A Low-latency, 3GPP-compliant 5G Core Network
