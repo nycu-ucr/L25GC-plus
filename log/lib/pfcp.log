@@ -12,3 +12,6 @@ time="2023-11-02T06:13:40-05:00" level=info msg="Remove Request Transaction [3]\
 time="2023-11-02T06:40:35-05:00" level=info msg="Remove Request Transaction [1]\n" category=PFCP component=LIB
 time="2023-11-02T06:41:49-05:00" level=info msg="Remove Request Transaction [2]\n" category=PFCP component=LIB
 time="2023-11-02T06:41:49-05:00" level=info msg="Remove Request Transaction [3]\n" category=PFCP component=LIB
+time="2023-11-02T06:58:05-05:00" level=info msg="Remove Request Transaction [1]\n" category=PFCP component=LIB
+time="2023-11-02T06:58:44-05:00" level=info msg="Remove Request Transaction [2]\n" category=PFCP component=LIB
+time="2023-11-02T06:58:44-05:00" level=info msg="Remove Request Transaction [3]\n" category=PFCP component=LIB
