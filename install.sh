@@ -46,6 +46,13 @@ sudo rm -rf ./build; make
 cd $HOME/L25GC-plus
 sudo rm -rf $HOME/.cache
 
+echo "export ONVMPOLLER_IPID_YAML=$HOME/L25GC-plus/onvm_config_yaml/ipid.yaml" >> ~/.bashrc
+echo "export ONVMPOLLER_NFIP_YAML=$HOME/L25GC-plus/onvm_config_yaml/NFip.yaml" >> ~/.bashrc
+echo "export ONVMPOLLER_IPID_TXT=$HOME/L25GC-plus/onvm_config_yaml/ipid.txt" >> ~/.bashrc
+echo "export CGO_LDFLAGS_ALLOW='-Wl,(--whole-archive|--no-whole-archive)'" >> ~/.bashrc
+echo "export ONVM_NF_JSON=$HOME/onvm/NF_json/" >> ~/.bashrc
+source ~/.bashrc
+
 for i in $(seq 1 4)
 do
     for nf in $NFs
@@ -56,14 +63,6 @@ do
     done
 done
 cd $HOME
-
-echo "export ONVMPOLLER_IPID_YAML=$HOME/L25GC-plus/onvm_config_yaml/ipid.yaml" >> ~/.bashrc
-echo "export ONVMPOLLER_NFIP_YAML=$HOME/L25GC-plus/onvm_config_yaml/NFip.yaml" >> ~/.bashrc
-echo "export ONVMPOLLER_IPID_TXT=$HOME/L25GC-plus/onvm_config_yaml/ipid.txt" >> ~/.bashrc
-echo "export CGO_LDFLAGS_ALLOW='-Wl,(--whole-archive|--no-whole-archive)'" >> ~/.bashrc
-echo "export ONVM_NF_JSON=$HOME/onvm/NF_json/" >> ~/.bashrc
-
-source ~/.bashrc
 
 cd $HOME/L25GC-plus/onvm_test
 sudo rm -rf ~/go/pkg/mod/github.com
