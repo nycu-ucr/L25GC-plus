@@ -44,47 +44,47 @@ series = {SIGCOMM '22}
 
 ## Installation ##
 clone L25GC+
-'''
+~~~
 cd ~
 git clone https://github.com/nycu-ucr/L25GC-plus.git
-'''
+~~~
 install
-'''
+~~~
 cd ~/L25GC-plus
 ./install.sh
-'''
+~~~
 
 ## Running and Testing ##
 run onvm manager
-'''
+~~~
 cd ~/onvm
 ./run_manager.sh
-'''
+~~~
 run upf-u (in new terminal)
-'''
+~~~
 cd ~/onvm/onvm-upf/5gc/upf_u_complete
 sudo ./go.sh 1
-'''
+~~~
 run upf-c (in new terminal)
-'''
+~~~
 cd ~/onvm/onvm-upf/5gc/upf_c_complete
 sudo ./go.sh 2
-'''
+~~~
 run NFs (in new terminal)
-'''
+~~~
 cd ~/L25GC-plus
 ./run.sh
-'''
+~~~
 run Test (in new terminal)
-'''
+~~~
 cd ~/L25GC-plus/onvm_test
 NF_NAME=tmp sudo -E /usr/local/go/bin/go test -v -vet=off -run TestRegistration -args noinit
-'''
+~~~
 
 stop L25GC+
-'''
+~~~
 cd ~/onvm
 ./force_kill.sh
-'''
+~~~
 ## Communication ##
 If you have any questions or comments, please feel free to email us (l25gc@googlegroups.com) or join our [Google group](https://groups.google.com/g/l25gc/).
