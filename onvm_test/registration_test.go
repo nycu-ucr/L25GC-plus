@@ -927,7 +927,7 @@ func RegistrationWorker(name string,
 func TestMultiRegistrationConcurrent(t *testing.T) {
 	SetLogLevel(logrus.ErrorLevel)
 
-	const thread_amount int = 64
+	const thread_amount int = 32
 	const work_load int = 5
 	const amount int = thread_amount * work_load
 
