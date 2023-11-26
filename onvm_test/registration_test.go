@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"testing"
 	"time"
+	"strconv"
 
 	"test"
 
@@ -924,12 +925,29 @@ func RegistrationWorker(name string,
 	// fmt.Println(name, "done")
 }
 
-func TestMultiRegistrationConcurrent(t *testing.T) {
+func StringToInteger(str string) (int, error) {
+    intValue, err := strconv.Atoi(str)
+    if err != nil {
+        return 0, err
+    }
+    return intValue, nil
+}
+
+
+func TestMultiRegistrationConcurrent(t *testing.T) {	
 	SetLogLevel(logrus.ErrorLevel)
 
-	const thread_amount int = 32
-	const work_load int = 5
-	const amount int = thread_amount * work_load
+	thread_amount, err := StringToInteger(os.Args[6])
+	if err != nil {
+        t.Errorf("Invalid thread_amount: %s", err)
+        return
+    }
+	work_load, err := StringToInteger(os.Args[7])
+	if err != nil {
+        t.Errorf("Invalid work_load: %s", err)
+        return
+    }
+	amount  := thread_amount * work_load
 
 	mobile_identiy_groups := GenerateMobileIdentityGroup()[:amount]
 	reg_latency_chan := make(chan time.Duration, amount+1)

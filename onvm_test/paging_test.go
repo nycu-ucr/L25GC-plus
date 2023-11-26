@@ -850,12 +850,28 @@ func DownlinkDataController(signal_chan chan string, thread_amount int) {
 	}
 }
 
+// func StringToInteger(str string) (int, error) {
+//     intValue, err := strconv.Atoi(str)
+//     if err != nil {
+//         return 0, err
+//     }
+//     return intValue, nil
+// }
+
 func TestMultiPagingConcurrent(t *testing.T) {
 	SetLogLevel(logrus.InfoLevel)
 
-	const thread_amount int = 1
-	const work_load int = 100
-	const amount int = thread_amount * work_load
+	thread_amount, err := StringToInteger(os.Args[6])
+	if err != nil {
+        t.Errorf("Invalid thread_amount: %s", err)
+        return
+    }
+	work_load, err := StringToInteger(os.Args[7])
+	if err != nil {
+        t.Errorf("Invalid work_load: %s", err)
+        return
+    }
+	amount  := thread_amount * work_load
 
 	mobile_identiy_groups := GenerateMobileIdentityGroup()[:amount]
 	work_data_array := make([]WorkData, amount)

@@ -8,7 +8,8 @@ import (
 	"test"
 	"testing"
 	"time"
-
+	"os"
+	
 	"git.cs.nctu.edu.tw/calee/sctp"
 	"github.com/mohae/deepcopy"
 	"github.com/nycu-ucr/CommonConsumerTestData/UDM/TestGenAuthData"
@@ -22,6 +23,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 )
 
 type Container struct {
@@ -613,6 +615,7 @@ func TestN2Handover(t *testing.T) {
 	// terminate all NF
 	//	NfTerminate()
 }
+
 
 func TestMultiN2Handover(t *testing.T) {
 	var workload = 10
@@ -1727,12 +1730,17 @@ func HandoverWorker(name string, wg *sync.WaitGroup, work_data_array []WorkData,
 	fmt.Println(name, "done")
 }
 
+
 func TestMultiN2HandoverConcurrent(t *testing.T) {
 	SetLogLevel(logrus.ErrorLevel)
 
-	const thread_amount int = 16
+	thread_amount, err := StringToInteger(os.Args[6])
+	if err != nil {
+        t.Errorf("Invalid thread_amount: %s", err)
+        return
+    }
 	const work_load int = 1
-	const amount int = thread_amount * work_load
+	amount  := thread_amount * work_load // 16 * 1
 	LockForHandover.counter = 0
 	//fmt.Println([]uint8{0x01, 0x02, 0xf8, 0x39, 0xf0, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10})
 	//fmt.Println([]uint8{0x02, 0x02, 0xf8, 0x39, 0xca, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x01})
