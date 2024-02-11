@@ -90,4 +90,4 @@ cd ~/onvm
 If you have any questions or comments, please feel free to email us (l25gc@googlegroups.com) or join our [Google group](https://groups.google.com/g/l25gc/).
 
 ## License
-L25GC+ is now under [Apache 2.0](https://github.com/L25GC-plus/L25GC-plus/blob/master/LICENSE.txt) license.
+L25GC+ is now under [Apache 2.0](https://github.com/nycu-ucr/L25GC-plus/blob/main/LICENSE) license.
