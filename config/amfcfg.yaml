@@ -52,7 +52,7 @@ configuration:
       - NEA0
       # - NEA2
   networkName:  # the name of this core network
-    full: free5GC
+    full: L25GC+
     short: free
   ngapIE: # Optional NGAP IEs
     mobilityRestrictionList: # Mobility Restriction List IE, refer to TS 38.413
