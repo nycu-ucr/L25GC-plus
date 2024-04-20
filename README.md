@@ -54,6 +54,55 @@ cd ~/L25GC-plus
 ./install.sh
 ~~~
 
+## intallation in docker ##
+### clone nycu-ucr/onvm
+```
+sudo apt install libnuma-dev
+git clone https://github.com/nycu-ucr/onvm.git
+cd onvm
+git checkout opensource
+source ./build_testbed.sh
+
+cd onvm-upf/scripts
+./install.sh
+```
+press Y/N to bind DPDK NICs, you need at least 2 NICs to run L25GC+
+
+### pull and run docker images
+```
+sudo apt install docker.io
+sudo docker pull linpoyi/l25gc-plus_v0
+sudo docker run -it --privileged --name test_v1 linpoyi/l25gc-plus_v0
+```
+
+### setup huge pages in container(in container's bash)
+```
+su linpoyi #password: wirelab020
+cd ~/onvm/onvm-upf/dpdk/usertools
+./dpdk-setup.sh
+49 #setup huge pages
+1024 #number of huge pages
+62 # exit script
+```
+
+### pull and run mongodb images(in new terminal)
+```
+sudo docker pull mongo
+sudo docker run --name db mongo
+```
+
+### check docker network
+```
+docker network inspect bridge
+```
+find the ipv4 address of container "db"
+
+### modified config in L25GC+(back to L25GC+'s bash)
+```
+vim ~/L25GC-plus/config/nrfcfg.yaml
+```
+change "MongoDBUrl" from 127.0.0.1 to the ip address of db container
+
 ## Running and Testing ##
 run onvm manager
 ~~~
