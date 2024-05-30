@@ -4,12 +4,12 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"testing"
 	"time"
-	"strconv"
 
 	"test"
 
@@ -947,7 +947,17 @@ func TestMultiRegistrationConcurrent(t *testing.T) {
         t.Errorf("Invalid work_load: %s", err)
         return
     }
-	amount  := thread_amount * work_load
+	is_wait := os.Args[8]
+	wait_time := 0
+	if is_wait == "y" {
+		var err error
+		wait_time, err = StringToInteger(os.Args[9])
+		if err != nil {
+			t.Errorf("Invalid wait_time: %s", err)
+			return
+		}
+	}
+	amount := thread_amount * work_load
 
 	mobile_identiy_groups := GenerateMobileIdentityGroup()[:amount]
 	reg_latency_chan := make(chan time.Duration, amount+1)
@@ -973,7 +983,9 @@ func TestMultiRegistrationConcurrent(t *testing.T) {
 		name := fmt.Sprintf("Worker%d", x)
 		// fmt.Println("From", work_data_array[x*work_load].id, "To", work_data_array[x*work_load+(work_load-1)].id)
 		go RegistrationWorker(name, wg, work_data_array[x*work_load:x*work_load+(work_load)], reg_latency_chan, pdu_latency_chan, t)
-		// time.Sleep(5 * time.Millisecond)
+		if is_wait == "y" {
+			time.Sleep(time.Duration(wait_time) * time.Millisecond)
+		}
 	}
 	wg.Wait()
 
