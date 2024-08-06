@@ -126,8 +126,12 @@ cd ~/L25GC-plus
 ~~~
 run Test (in new terminal)
 ~~~
-cd ~/L25GC-plus/onvm_test
-NF_NAME=tmp sudo -E /usr/local/go/bin/go test -v -vet=off -run TestRegistration -args noinit
+cd ~/L25GC-plus
+./select_test.sh
+
+1) TestRegistration                 4) TestN2Handover
+2) TestMultiRegistrationConcurrent  5) TestMultiN2HandoverConcurrent
+3) TestMultiPagingConcurrent        6) Quit
 ~~~
 
 stop L25GC+
