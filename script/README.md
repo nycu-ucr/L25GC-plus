@@ -7,13 +7,20 @@
 ### Core Network ###
 
 ~~~
-./setupCN.sh
+# set up ip route
+cd $HOME
+sudo ip route del 192.168.1.0/24 dev enp6s0f1
+sudo ip route add 192.168.1.4/32 dev enp6s0f1
+~~~
+
+~~~
+./CNenvironment.sh
 ~~~
 
 ### UE  ###
 
 ~~~
-./setupUE.sh
+./UEenvironment.sh
 ~~~
 
 ### DN  ###
@@ -28,6 +35,7 @@ In L25GC-plus VM, we need to edit three files:
 
 - `~/L25GC-plus/config/amfcfg.yaml`
 - `~/L25GC-plus/config/smfcfg.yaml`
+- `~/onvm/onvm-upf/5gc/upf_u_complete/upf_u.txt`
 First SSH into L25GC-plus VM, and change `~/L25GC-plus/config/amfcfg.yaml`:
 ```
 cd ~/L25GC-plus
@@ -67,6 +75,32 @@ into:
      endpoints: # the IP address of this N3/N9 interface on this UPF
        - 192.168.1.2  # 127.0.0.8
 ```
+
+Next edit `~/onvm/onvm-upf/5gc/upf_u_complete/upf_u.txt`:
+
+```
+# DN MAC Address
+3c:fd:fe:b4:fd:6d
+# AN MAC Address
+3c:fd:fe:b0:ef:f4
+# UPF ID Address
+10.10.1.2
+```
+into:
+```
+# DN MAC Address
+90:e2:ba:b5:15:81
+# AN MAC Address
+90:e2:ba:b5:14:30
+# UPF ID Address
+192.168.1.2
+```
+
+~~~
+90:e2:ba:b5:15:81 is  Host3 enp6s0f1 MAC ADDRESS
+3c:fd:fe:b0:ef:f4 is  Host1 enp6s0f0 MAC ADDRESS
+192.168.1.2       is  Host2 enp6s0f0 MAC ADDRESS
+~~~
 
 ### Setting UERANSIM Parameters
 In the ueransim VM, there are two files related to L25GC-plus：
