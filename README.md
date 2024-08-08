@@ -144,9 +144,11 @@ cd ~/onvm
 - You could setup the experiment environment by running the provided scrips.
 ### Steps
 1. Adjust the parameters in `scripts/set_nw_env.sh`
-2. Run the setup script with target environment
+    - Reference architecture
+        ![ref_architecture](./scripts/ref_architecture.png)
+2. Run the setup script in `scripts` with target environment
     ```
-    ./scripts/setup.sh <ue|cn|dn>
+    ./setup.sh <ue|cn|dn>
     ```
 3. Follow the `Running and Testing` to run the L25GC+.
 
