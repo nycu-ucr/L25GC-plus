@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-# Incluse NW settings
+# Include NW settings
 . ./set_nw_env.sh
 
 # Modify IP
