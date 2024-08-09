@@ -25,7 +25,7 @@ git clone https://github.com/nycu-ucr/onvm.git
 cd $HOME/onvm
 git checkout opensource
 
-echo -e "${YELLOW}Install go1.19${NC}"
+echo -e "${YELLOW}Install go1.21${NC}"
 ./install_go.sh
 
 source ~/.bashrc

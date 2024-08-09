@@ -142,6 +142,7 @@ cd ~/onvm
 
 ## Environment Setup
 - You could setup the experiment environment by running the provided scrips.
+- For more information about config file settings, please refer to this [link](./scripts/README.md).
 ### Steps
 1. Adjust the parameters in `scripts/set_nw_env.sh`
     - Reference architecture
