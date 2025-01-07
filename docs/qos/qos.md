@@ -36,6 +36,9 @@ By combining the trTCM and Token Bucket algorithms, fine-grained control of netw
         - `QoS token Rate =  min ((GBR + (AMBR-GBR)/2 ) , MBR)`
         - `Non QoS token rate = AMBR - QoS Rate`
 
+    ![](./images/workflow.png)
+    The diagram shows our workflow. When traffic arrives, it is classified as either QoS flow or Non-QoS flow and processed through the corresponding bucket. Additionally, QoS flow undergoes extra trTCM processing.
+
 
 ### QoS Parameters
 

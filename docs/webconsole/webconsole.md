@@ -62,10 +62,10 @@ Password: free5gc
             - Downlink GBR/MBR (Guaranteed/Maximum Bit Rate)
                 - Applicable for GBR 5QI flows
 
-    ![](./images/subscriberData1.png)
-    ![](./images/subscriberData2.png)
-    ![](./images/subscriberData3.png)
-    ![](./images/flow_rules.png)
+        ![](./images/subscriberData1.png)
+        ![](./images/subscriberData2.png)
+        ![](./images/subscriberData3.png)
+        ![](./images/flow_rules.png)
 
-> Check that the `Submit` was added successfully
+> Check that the `new subscribers` was added successfully
     ![](./images/create_subscriber2.png)
