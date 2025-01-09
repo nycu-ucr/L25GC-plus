@@ -20,21 +20,22 @@ By combining the trTCM and Token Bucket algorithms, fine-grained control of netw
 ![upf_workflow](./images/upf_workflow.png)
 > This diagram illustrates the workflow of the onvm-upf used in L25GC+. The trTCM and token buckets are implemented in the packet handler to ensure quality of service.
 
-1. **Packet Arrival**
-     - Look up the corresponding record in the UE IP Address Table based on the UE IP address in the packet.
+### Packet Handler
+![packet_handler](./images/packet_handler.png)
+> This diagram illustrates the workflow of the trTCM and token buckets in packet handler.
+1. **PDR classification**
+    - Classify packets into QoS or Non-QoS flows based on the PDR.
 2. **QoS Flow Processing**
-     - If the corresponding record is found and the traffic belongs to QoS flow:
-         - **trTCM Processing**: Use the trTCM library to classify the packet and decide whether to discard or forward it based on the color result.
-         - **Token Bucket Processing**: Decide whether to allow the packet to pass based on the color result from trTCM and the number of tokens in the token bucket.
-     - If the corresponding record is found but the traffic does not belong to QoS flow:
-         - **Token Bucket Processing**: Directly process the packet using the token bucket algorithm.
+    - If the traffic belongs to a QoS flow:
+        1. **trTCM**: Consists of a meter and a policer. The meter marks packets based on the QoS parameters, while the policer drops red packets that exceed the Maximum Flow Bit Rate (MFBR).
+        2. **QoS Traffic Shaper**: A token bucket serves as a traffic shaper to ensure compliance with session-AMBR.
 3. **Non QoS Flow Processing**
-     - If no corresponding record is found, the traffic is considered to belong to Non-QoS flow.
-         - **Token Bucket Processing**: Process the packet using the token bucket algorithm.
+    - If the traffic belongs to a Non-QoS flow:
+        1. **Non-QoS Traffic Shaper**: A token bucket serves as a traffic shaper to ensure compliance with session-AMBR.
 4. **Token Bucket Update**
-     - Whether it is QoS flow or Non QoS flow, the number of tokens in the corresponding token bucket needs to be updated after each packet is processed.
-        - `QoS token Rate =  min((GBR + (AMBR-GBR)/2 ) , MBR)`
-        - `Non QoS token rate = AMBR - QoS Rate`
+    - Whether it is QoS flow or Non QoS flow, the number of tokens in the corresponding token bucket needs to be updated after each packet is processed.
+    - `QoS Token Rate =  min((GBR + (AMBR-GBR)/2) , MBR)`
+    - `Non-QoS Token Rate = AMBR - QoS Token Rate`
 
 
 ## Experimental Results
