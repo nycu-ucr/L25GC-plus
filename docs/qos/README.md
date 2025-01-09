@@ -29,11 +29,11 @@ By combining the trTCM and Token Bucket algorithms, fine-grained control of netw
     - If the traffic belongs to a QoS flow:
         1. **trTCM**: Consists of a meter and a policer. The meter marks packets based on the QoS parameters, while the policer drops red packets that exceed the Maximum Flow Bit Rate (MFBR).
         2. **QoS Traffic Shaper**: A token bucket serves as a traffic shaper to ensure compliance with session-AMBR.
-3. **Non QoS Flow Processing**
+3. **Non-QoS Flow Processing**
     - If the traffic belongs to a Non-QoS flow:
         1. **Non-QoS Traffic Shaper**: A token bucket serves as a traffic shaper to ensure compliance with session-AMBR.
 4. **Token Bucket Update**
-    - Whether it is QoS flow or Non QoS flow, the number of tokens in the corresponding token bucket needs to be updated after each packet is processed.
+    - Whether it is QoS flow or Non-QoS flow, the number of tokens in the corresponding token bucket needs to be updated after each packet is processed.
     - `QoS Token Rate =  min((GBR + (AMBR-GBR)/2) , MBR)`
     - `Non-QoS Token Rate = AMBR - QoS Token Rate`
 
