@@ -159,7 +159,9 @@ cd ~/onvm
 
 ### New feature 
 - QoS implementation is achieved using token bucket and trTCM to support GBR and MBR.
-- You can view the content and QoS settings through the following link: [QoS Configuration](./docs/config/README.md).
+- You can view the content and QoS settings through the following link: 
+    1. [QoS Configuration in Webconsole](./docs/webconsole/README.md).
+    2. [QoS Design Document](./docs/qos/README.md)
 
 ## Communication ##
 If you have any questions or comments, please feel free to email us (l25gc@googlegroups.com) or join our [Google group](https://groups.google.com/g/l25gc/).
