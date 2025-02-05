@@ -15,13 +15,13 @@ L25GC+ is built on the open-source kernel-based 5GC implementation called free5G
 <!-- To address these challenges, we develop $L^25GC+$, a significant enhancement to $L^25GC$. $L^25GC+$ re-designs the shared-memory-based networking stack to support synchronous I/O between control plane functions. $L^25GC+$ distinguishes different user sessions and maintains strict 3GPP compliance. $L^25GC+$ also offers seamless integration with existing 5GC microservice implementations through equivalent SBI APIs, reducing code refactoring and porting efforts. By leveraging shared memory I/O and overcoming $L^25GC$’s limitations, $L^25GC+$ provides an improved solution to optimize the 5G control plane, enhancing latency, scalability, and overall user experience. We demonstrate the improved performance of $L^25GC+$ on a 5G testbed with commercial basestations and multiple UEs. -->
 
 For more design details, please refer to:
-- SIGCOMM 2022: [L25GC: A Low Latency 5G Core Network based on High-Performance NFV Platforms](docs/papers/l25gc-sigcomm22.pdf)
-- CloudNet 2023: [L25GC+: An Improved, 3GPP-compliant 5G Core for Low-latency Control Plane Operations](docs/papers/L25GC%2B.pdf)
+- SIGCOMM 2022: [L25GC: A Low Latency 5G Core Network based on High-Performance NFV Platforms](docs/papers/l25gc.pdf)
+- CloudNet 2023: [L25GC+: An Improved, 3GPP-compliant 5G Core for Low-latency Control Plane Operations](docs/papers/l25gc+.pdf)
 
 
+<!--
 ## Installation guideline and SIGCOMM artifact evaluation ##
 To reproduce the experiment in [our paper](docs/papers/l25gc-sigcomm22.pdf), please refer to [artifact documentation](docs/ARTIFACTS.md).
-
 ## Publication ##
 ~~~
 @inproceedings{l25gc-sigcomm22,
@@ -41,20 +41,11 @@ location = {Amsterdam, Netherlands},
 series = {SIGCOMM '22}
 }
 ~~~
+-->
 
-## Installation ##
-clone L25GC+
-~~~
-cd ~
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-~~~
-install
-~~~
-cd ~/L25GC-plus
-./install.sh
-~~~
 
-## intallation in docker ##
+
+## Intallation in docker ##
 ### clone nycu-ucr/onvm
 ```
 sudo apt install libnuma-dev
@@ -103,6 +94,19 @@ vim ~/L25GC-plus/config/nrfcfg.yaml
 ```
 change "MongoDBUrl" from 127.0.0.1 to the ip address of db container
 
+
+## Installation ##
+clone L25GC+
+~~~
+cd ~
+git clone https://github.com/nycu-ucr/L25GC-plus.git
+~~~
+install
+~~~
+cd ~/L25GC-plus
+./install.sh
+~~~
+
 ## Running and Testing ##
 run onvm manager
 ~~~
@@ -142,16 +146,22 @@ cd ~/onvm
 
 ## Environment Setup
 - You could setup the experiment environment by running the provided scrips.
-- For more information about config file settings, please refer to this [link](./scripts/README.md).
+- For more information about config file settings, please refer to this [link](./docs/config/README.md).
 ### Steps
 1. Adjust the parameters in `scripts/set_nw_env.sh`
     - Reference architecture
-        ![ref_architecture](./scripts/ref_architecture.png)
+        ![ref_architecture](./docs/config/ref_architecture.png)
 2. Run the setup script in `scripts` with target environment
     ```
     ./setup.sh <ue|cn|dn>
     ```
 3. Follow the `Running and Testing` to run the L25GC+.
+
+### New feature 
+- QoS implementation is achieved using token bucket and trTCM to support GBR and MBR.
+- You can view the content and QoS settings through the following link: 
+    1. [QoS Configuration in Webconsole](./docs/webconsole/README.md).
+    2. [QoS Design Document](./docs/qos/README.md)
 
 ## Communication ##
 If you have any questions or comments, please feel free to email us (l25gc@googlegroups.com) or join our [Google group](https://groups.google.com/g/l25gc/).
