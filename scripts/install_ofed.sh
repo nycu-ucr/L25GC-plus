@@ -55,4 +55,7 @@ tar xvf ofed.tgz
 cd MLNX_OFED_LINUX-24.10-2.1.8.0-ubuntu20.04-x86_64
 sudo ./mlnxofedinstall --dpdk
 
+echo "load new driver"
+sudo /etc/init.d/openibd restart
+
 echo "Install ofed driver finished, failed to update firmware is OK"
