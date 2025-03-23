@@ -4,8 +4,10 @@ WORK_DIR=$HOME
 
 ### Install Packages
 sudo apt update && sudo apt upgrade -y
+# env setup
+sudo apt install net-tools -y
 # essential for build
-sudo apt install libnuma-dev
+sudo apt install libnuma-dev -y
 # mongo
 sudo apt install -y gnupg curl
 curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
