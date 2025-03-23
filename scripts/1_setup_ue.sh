@@ -4,8 +4,8 @@ WORK_DIR=$HOME
 
 # Install pkgs
 sudo apt update && sudo apt upgrade -y
-sudo apt install make git iperf3 net-tools
-sudo apt install -y make git g++ libsctp-dev lksctp-tools iproute2
+sudo apt install make git iperf3 net-tools -y
+sudo apt install make git g++ libsctp-dev lksctp-tools iproute2 -y
 
 # Install cmake
 cd $WORK_DIR
