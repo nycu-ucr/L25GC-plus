@@ -19,6 +19,7 @@ sudo systemctl start mongod
 cd $WORK_DIR
 git clone https://github.com/nycu-ucr/L25GC-plus.git
 cd L25GC-plus
+git clone https://github.com/nycu-ucr/onvmpoller.git
 ./install.sh 
 
 ### free5GC webconsole
