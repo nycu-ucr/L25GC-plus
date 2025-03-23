@@ -4,8 +4,10 @@ WORK_DIR=$HOME
 
 ### Install Packages
 sudo apt update && sudo apt upgrade -y
+# env setup
+sudo apt install net-tools -y
 # essential for build
-sudo apt install libnuma-dev
+sudo apt install libnuma-dev -y
 # mongo
 sudo apt install -y gnupg curl
 curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
@@ -19,6 +21,7 @@ sudo systemctl start mongod
 cd $WORK_DIR
 git clone https://github.com/nycu-ucr/L25GC-plus.git
 cd L25GC-plus
+git clone https://github.com/nycu-ucr/onvmpoller.git
 ./install.sh 
 
 ### free5GC webconsole
