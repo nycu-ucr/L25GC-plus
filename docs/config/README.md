@@ -16,7 +16,7 @@ cd ~/L25GC-plus
 nano config/amfcfg.yaml
 ```
 
-Replace ngapIpList IP from `127.0.0.1` to `128.105.144.107`, namely from:
+Replace ngapIpList IP from `127.0.0.1` to `128.105.144.114`, namely from:
 ```
 ...
   ngapIpList:  # the IP list of N2 interfaces on this AMF
@@ -26,7 +26,7 @@ into:
 ```
 ...
   ngapIpList:  # the IP list of N2 interfaces on this AMF
-  - 128.105.144.107  # 127.0.0.1
+  - 128.105.144.114  # 127.0.0.1
 ```
 
 Next edit `~/L25GC-plus/config/smfcfg.yaml`:
@@ -72,7 +72,7 @@ into:
 
 ~~~
 90:e2:ba:b5:15:81 is  Host3 ens1f1 MAC ADDRESS
-3c:fd:fe:b0:ef:f4 is  Host1 ens1f0 MAC ADDRESS
+90:e2:ba:b5:14:30 is  Host1 ens1f0 MAC ADDRESS
 192.168.1.2       is  Host2 ens1f0 MAC ADDRESS
 ~~~
 
