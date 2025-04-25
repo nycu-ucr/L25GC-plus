@@ -11,3 +11,4 @@ IPIDMap:
   127.0.0.3:  8   # UDM, port 8000
   127.0.0.5:  9   # TMP, test script use
   127.0.0.8:  2   # UPF-C, N4 interface
+  127.0.0.113: 13 # CHF

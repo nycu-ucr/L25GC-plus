@@ -26,7 +26,7 @@ git clone https://github.com/nycu-ucr/onvmpoller.git
 
 ### free5GC webconsole
 cd $WORK_DIR
-git clone --recursive -b v3.3.0 -j `nproc` https://github.com/free5gc/free5gc.git
+git clone --recursive -b v4.0.0 -j `nproc` https://github.com/free5gc/free5gc.git
 cd free5gc
 # install nodejs
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 

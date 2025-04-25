@@ -1,5 +1,5 @@
 info:
-  version: 1.0.2
+  version: 1.1.0
   description: UDR initial local configuration
 
 configuration:
@@ -11,10 +11,12 @@ configuration:
     tls: # the local path of TLS key
       pem: cert/udr.pem # UDR TLS Certificate
       key: cert/udr.key # UDR TLS Private key
+  dbConnectorType: mongodb 
   mongodb:
     name: free5gc # Database name in MongoDB
     url: mongodb://localhost:27017 # URL of MongoDB
   nrfUri: http://127.0.0.10:8000 # a valid URI of NRF
+  nrfCertPem: cert/nrf.pem # NRF Certificate
 
 logger: # log output setting
   enable: true # true or false
