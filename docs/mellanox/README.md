@@ -42,6 +42,7 @@ To install L25GC+ on a machine with Mellanox NICs, follow the steps below:
     ```
 - Rebuild and install DPDK:
     ```bash
+    source ~/.bashrc
     cd $HOME/onvm/onvm-upf/scripts
     ./install.sh
     ```
