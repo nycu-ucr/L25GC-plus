@@ -6,7 +6,7 @@ GREEN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m'
 
-NFs="nrf amf smf udr pcf udm nssf ausf"
+NFs="nrf amf smf udr pcf udm nssf ausf chf"
 
 cd $HOME
 sudo apt -y update
