@@ -15,3 +15,5 @@ NF_NAME=nssf sudo -E taskset -c 11 ./bin/nssf &
 sleep 2
 NF_NAME=ausf sudo -E taskset -c 12 ./bin/ausf &
 sleep 2
+NF_NAME=chf sudo -E taskset -c 13 ./bin/chf &
+sleep 2
