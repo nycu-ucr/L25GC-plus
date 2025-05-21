@@ -43,121 +43,62 @@ series = {SIGCOMM '22}
 ~~~
 -->
 
-
-
-## Intallation in docker ##
-### clone nycu-ucr/onvm
-```
-sudo apt install libnuma-dev
-git clone https://github.com/nycu-ucr/onvm.git
-cd onvm
-git checkout opensource
-source ./build_testbed.sh
-
-cd onvm-upf/scripts
-./install.sh
-```
-press Y/N to bind DPDK NICs, you need at least 2 NICs to run L25GC+
-
-### pull and run docker images
-```
-sudo apt install docker.io
-sudo docker pull linpoyi/l25gc-plus_v0
-sudo docker run -it --privileged --name test_v1 linpoyi/l25gc-plus_v0
-```
-
-### setup huge pages in container(in container's bash)
-```
-su linpoyi #password: wirelab020
-cd ~/onvm/onvm-upf/dpdk/usertools
-./dpdk-setup.sh
-49 #setup huge pages
-1024 #number of huge pages
-62 # exit script
-```
-
-### pull and run mongodb images(in new terminal)
-```
-sudo docker pull mongo
-sudo docker run --name db mongo
-```
-
-### check docker network
-```
-docker network inspect bridge
-```
-find the ipv4 address of container "db"
-
-### modified config in L25GC+(back to L25GC+'s bash)
-```
-vim ~/L25GC-plus/config/nrfcfg.yaml
-```
-change "MongoDBUrl" from 127.0.0.1 to the ip address of db container
-
-
-## Installation ##
-clone L25GC+
-~~~
-cd ~
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-~~~
-install
-~~~
-cd ~/L25GC-plus
-./install.sh
-~~~
-
-## Running and Testing ##
-run onvm manager
-~~~
-cd ~/onvm
-./run_manager.sh
-~~~
-run upf-u (in new terminal)
-~~~
-cd ~/onvm/onvm-upf/5gc/upf_u_complete
-sudo ./go.sh 1
-~~~
-run upf-c (in new terminal)
-~~~
-cd ~/onvm/onvm-upf/5gc/upf_c_complete
-sudo ./go.sh 2
-~~~
-run NFs (in new terminal)
-~~~
-cd ~/L25GC-plus
-./run.sh
-~~~
-run Test (in new terminal)
-~~~
-cd ~/L25GC-plus
-./select_test.sh
-
-1) TestRegistration                 4) TestN2Handover
-2) TestMultiRegistrationConcurrent  5) TestMultiN2HandoverConcurrent
-3) TestMultiPagingConcurrent        6) Quit
-~~~
-
-stop L25GC+
-~~~
-cd ~/onvm
-./force_kill.sh
-~~~
-
-## Environment Setup
-- You could setup the experiment environment by running the provided scrips.
-- For more information about config file settings, please refer to this [link](./docs/config/README.md).
-### Steps
-1. Adjust the parameters in `scripts/set_nw_env.sh`
-    - Reference architecture
-        ![ref_architecture](./docs/config/ref_architecture.png)
-2. Run the setup script in `scripts` with target environment
+## Installation
+- **Tested OS**: `Ubuntu 20.04`
+-  **NIC Requirement**; You need at least **two** DPDK-compatible NICs to run L25GC+. These interfaces must be bound to a supported DPDK driver (e.g., `igb_uio`).  
+    > *Note:* In some environments, the interface must be brought down before binding.
+    ```bash
+    sudo ip link set <interface> down
+    sudo ~/onvm/onvm-upf/dpdk/usertools/dpdk-devbind.py -s
+    sudo ~/onvm/onvm-upf/dpdk/usertools/dpdk-devbind.py -b igb_uio <PCI>
     ```
+
+### Environment Setup
+- You can setup the experiment environment by running the provided scripts.
+    - For details about configuration files, please refer to this [link](./docs/config/README.md).
+
+### Setup Steps
+1. Adjust the parameters in `scripts/set_nw_env.sh`
+    - Reference architecture:
+        ![ref_architecture](./docs/config/ref_architecture.png)
+2. Run the setup script on target machine
+    ```bash
+    cd scripts
     ./setup.sh <ue|cn|dn>
     ```
-3. Follow the `Running and Testing` to run the L25GC+.
+3. Follow the steps in the [Running L25GC+](#running-l25gc) section below to start L25GC+.
 
-### New feature 
+
+## Running L25GC+
+1. **Run ONVM Manager**
+    ```bash
+    cd ~/onvm
+    ./run_manager.sh
+    ```
+2. **Run UPF-U** (new terminal)
+    ```bash
+    cd ~/onvm/onvm-upf/5gc/upf_u_complete
+    sudo ./go.sh 1
+    ```
+3. **Run UPF-C** (new terminal)
+    ```bash
+    cd ~/onvm/onvm-upf/5gc/upf_c_complete
+    sudo ./go.sh 2
+    ```
+4. **Run 5GC Network Functions (NFs)** (new terminal)
+
+    ```bash
+    cd ~/L25GC-plus
+    ./run.sh
+    ```
+5. **Stop L25GC+**
+
+    ```bash
+    cd ~/onvm
+    ./force_kill.sh
+    ```
+
+## New feature 
 - QoS implementation is achieved using token bucket and trTCM to support GBR and MBR.
 - You can view the content and QoS settings through the following link: 
     1. [QoS Configuration in Webconsole](./docs/webconsole/README.md).
