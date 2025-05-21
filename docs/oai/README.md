@@ -88,8 +88,11 @@
 
 ## Test connection
 - OAI will create a virtual network interface on successful UE registration
+
     ![](./images/oai_ue_if.png)
+
 - Ping test result
+
     ![](./images/test_ping.png)
     > In this screenshot, `10.10.1.2` corresponds to the data network (DN) interface used in our test setup.
     
