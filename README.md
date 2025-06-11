@@ -45,6 +45,7 @@ series = {SIGCOMM '22}
 
 ## Installation
 - **Tested OS**: `Ubuntu 20.04`
+- If your environment is Ubuntu 22.04, please refer to [this documentation](./docs/ubuntu-22.04/README.md).
 -  **NIC Requirement**; You need at least **two** DPDK-compatible NICs to run L25GC+. These interfaces must be bound to a supported DPDK driver (e.g., `igb_uio`).  
     > *Note:* In some environments, the interface must be brought down before binding.
     ```bash

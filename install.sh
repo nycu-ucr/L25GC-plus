@@ -64,16 +64,16 @@ do
 done
 cd $HOME
 
-cd $HOME/L25GC-plus/onvm_test
-sudo rm -rf ~/go/pkg/mod/github.com
-sudo rm -rf ~/go/pkg/mod/cache
-sudo rm -rf ~/.cache
-go mod tidy
-sudo rm -rf ~/.cache
+# cd $HOME/L25GC-plus/onvm_test
+# sudo rm -rf ~/go/pkg/mod/github.com
+# sudo rm -rf ~/go/pkg/mod/cache
+# sudo rm -rf ~/.cache
+# go mod tidy
+# sudo rm -rf ~/.cache
 cd $HOME/L25GC-plus
 ./update_onvmpoller.sh
-cd $HOME/L25GC-plus/onvm_test
+# cd $HOME/L25GC-plus/onvm_test
 sudo rm -rf ~/.cache
-go mod tidy
+# go mod tidy
 
 source ~/.bashrc
