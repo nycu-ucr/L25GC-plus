@@ -34,3 +34,6 @@
 	path = NFs/chf
 	url = https://github.com/nycu-ucr/chf.git
 	branch = next
+[submodule "onvm-upf"]
+	path = onvm-upf
+	url = https://github.com/nycu-ucr/onvm-upf.git
