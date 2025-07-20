@@ -37,3 +37,6 @@
 [submodule "onvm-upf"]
 	path = onvm-upf
 	url = https://github.com/nycu-ucr/onvm-upf.git
+[submodule "xio"]
+	path = xio
+	url = https://github.com/nycu-ucr/onvmpoller.git
