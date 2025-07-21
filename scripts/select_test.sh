@@ -40,9 +40,3 @@ select opt in "${options[@]}"; do
             ;;
     esac
 done
-
-
-
-
-
-
