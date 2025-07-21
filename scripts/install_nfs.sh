@@ -72,8 +72,6 @@ source ~/.bashrc
 
 # 5GC NFs to Compile
 NFs="nrf amf smf udr pcf udm nssf ausf chf"
-# for i in $(seq 1 4)
-# do
 for nf in $NFs
 do
     ./scripts/update_xio.sh
