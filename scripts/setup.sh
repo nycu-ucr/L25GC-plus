@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 # Check arg
 if [ -z "$1" ]; then
     echo "Usage: $0 <ue|cn|dn>"

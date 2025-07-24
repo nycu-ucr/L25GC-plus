@@ -13,7 +13,7 @@ WORK_DIR=$HOME
 # ------------------------------------------------------------------------------
 
 echo "[INFO] Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update
 
 echo "[INFO] Installing essential utilities..."
 sudo apt install -y net-tools gnupg curl
