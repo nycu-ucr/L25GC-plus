@@ -71,7 +71,7 @@ source ~/.bashrc
 # ------------------------------------------------------------------------------
 
 # 5GC NFs to Compile
-NFs="nrf amf smf udr pcf udm nssf ausf chf"
+NFs="nrf nrf amf smf udr pcf udm nssf ausf chf" # NOTE: nrf is not built yet for the 1st time due to missing onvm_nflib.h
 for nf in $NFs
 do
     ./scripts/update_xio.sh
