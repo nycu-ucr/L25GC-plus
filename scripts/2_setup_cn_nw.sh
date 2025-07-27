@@ -1,6 +1,9 @@
 #!/usr/bin/bash
+
+WORK_DIR=$HOME
+
 # Include NW settings
-. ./set_nw_env.sh
+. $WORK_DIR/L25GC-plus/scripts/set_nw_env.sh
 
 # Modify IP
 sudo ip l set $CNANIF down

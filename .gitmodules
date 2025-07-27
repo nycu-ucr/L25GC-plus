@@ -34,3 +34,15 @@
 	path = NFs/chf
 	url = https://github.com/nycu-ucr/chf.git
 	branch = next
+[submodule "onvm-upf"]
+	path = NFs/onvm-upf
+	url = https://github.com/nycu-ucr/onvm-upf.git
+[submodule "xio"]
+	path = NFs/xio
+	url = https://github.com/nycu-ucr/onvmpoller.git
+[submodule "webconsole"]
+	path = webconsole
+	url = https://github.com/free5gc/webconsole.git
+[submodule "UERANSIM"]
+	path = UERANSIM
+	url = https://github.com/aligungr/UERANSIM.git
