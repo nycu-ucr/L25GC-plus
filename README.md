@@ -64,7 +64,8 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
 5. **Run Webconsole** (new terminal)
     > The webconsole is used to pre-store UE info in MongoDB for authentication and configure QoS.
     ```bash
-    ./webconsole/bin/webconsole
+    cd webconsole/ 
+    ./bin/webconsole
     ```
     See this [video]() for usage instructions.
 6. **Stop L25GC+**
