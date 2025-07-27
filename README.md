@@ -67,7 +67,7 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     cd webconsole/ 
     ./bin/webconsole
     ```
-    See this [video]() for usage instructions.
+    See this [video]() or [doc](docs/webconsole/README.md) for usage instructions.
 6. **Stop L25GC+**
     ```bash
     ./scripts/run/stop_cn.sh
