@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -e
 
 # Check arg
 if [ -z "$1" ]; then

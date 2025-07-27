@@ -12,21 +12,16 @@ For more design details, please refer to:
 - **Tested OS**: See [Tested OS Distributions](#tested-os-distributions)
 - **NIC Requirement**: You need at least **two** [DPDK-compatible NICs](https://core.dpdk.org/supported/nics/) to run L25GC+. 
 
-### Environment Setup
-- You can setup the experiment environment by running the provided scripts.
-    - For details about configuration files, please refer to this [link](./docs/config/README.md).
+- Reference topology:
+    ![ref_architecture](./docs/config/ref_architecture.png)
 
 ### Installation
-1. Adjust the parameters in `scripts/set_nw_env.sh`
-    - Reference architecture:
-        ![ref_architecture](./docs/config/ref_architecture.png)
-2. Run the setup script on target machine
+1. Run the setup script on target machine
     ```bash
-    cd scripts
-    ./setup.sh <ue|cn|dn>
+    ./scripts/setup.sh <ue|cn|dn>
     ```
 
-3. NIC interfaces must be bound to a [compatible DPDK driver](https://core.dpdk.org/supported/nics/) (e.g., `igb_uio`).  
+2. NIC interface on `CN` node must be bound to a [compatible DPDK driver](https://core.dpdk.org/supported/nics/) (e.g., `igb_uio`).  
     > *Note:* In some environments, the interface must be brought down before binding.
 
     ```bash
@@ -35,11 +30,19 @@ For more design details, please refer to:
     sudo ~/L25GC-plus/NFs/onvm-upf/subprojects/dpdk/usertools/dpdk-devbind.py -b igb_uio <PCIe addr>
     ```
 
-3. Follow the steps in the [Running L25GC+](#running-l25gc) section below to start L25GC+.
+---
 
+## Experiment Setup
+
+1. Configure `N2`, `N3`, and `UPF-U` on the CN node.
+2. Configure `UERANSIM` on the UE/AN node.
+3. Update IP routes and ARP settings in `scripts/set_nw_env.sh` for both UE/AN and DN nodes.
+4. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
+
+---
 
 ## Running L25GC+
-You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ NFs. This scripts assumes the `L25GC-plus` folder is your working directory.
+You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ NFs. This script assumes the `L25GC-plus` folder is your working directory.
 
 1. **Run ONVM Manager**
     ```bash
@@ -58,11 +61,47 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     source ~/.bashrc
     ./scripts/run/run_cp_nfs.sh
     ```
-5. **Stop L25GC+**
+5. **Run Webconsole** (new terminal)
+    > The webconsole is used to pre-store UE info in MongoDB for authentication and configure QoS.
+    ```bash
+    ./webconsole/bin/webconsole
+    ```
+    See this [video]() for usage instructions.
+6. **Stop L25GC+**
     ```bash
     ./scripts/run/stop_cn.sh
     ```
 
+## Running UERANSIM
+This script assumes the `L25GC-plus/UERANSIM` folder is your working directory.
+
+1. **Run gNB**
+    ```bash
+    ./build/nr-gnb -c config/free5gc-gnb.yaml
+    ```
+2. **Run UE** (new terminal)
+    ```bash
+    sudo ./build/nr-ue -c config/free5gc-ue.yaml
+    ```
+
+## Unit test
+1. **Ping Test (UE to DN)**
+    ```bash
+    # on UE/RAN node
+    ping -I uesimtun0 192.168.1.4
+    ```
+    Replace `192.168.1.4` with the IP of your DN node.
+2. **iperf3 Throughput Test**
+    ```bash
+    # On DN Node:
+    iperf3 -s -B 192.168.1.4
+    ```
+
+    ```bash
+    # On UE/RAN Node:
+    iperf3 -c 192.168.1.4 -B 10.60.0.1
+    ```
+    Replace `192.168.1.4` with the IP of your DN node. Assume `10.60.0.1` is the IP of `UE` (`uesimtun0`).
 ## Tested OS Distributions
 
 | OS Distribution | Status                        | Notes                                                                                |
@@ -115,8 +154,17 @@ The `NFs/` directory contains X-IO and all the L25GC+ NFs.
     1. [QoS Configuration in Webconsole](./docs/webconsole/README.md).
     2. [QoS Design Document](./docs/qos/README.md)
 
-## Communication ##
-If you have any questions or comments, please feel free to email us (l25gc@googlegroups.com) or join our [Google group](https://groups.google.com/g/l25gc/).
+
+---
+
+## Contact
+
+For questions, feedback, or collaboration inquiries:
+
+Email: [l25gc@googlegroups.com](mailto:l25gc@googlegroups.com)\
+Join our [Google Group](https://groups.google.com/g/l25gc/)
+
+---
 
 ## License
-L25GC+ is now under [Apache 2.0](https://github.com/nycu-ucr/L25GC-plus/blob/main/LICENSE) license.
+L25GC+ is released under the [Apache 2.0 License](LICENSE).
