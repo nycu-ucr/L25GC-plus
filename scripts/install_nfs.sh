@@ -1,5 +1,5 @@
 #!/bin/bash -i
-set -e
+# set -e
 
 # ==============================================================================
 # L25GC+ Control Plane and User Plane Setup Script
