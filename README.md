@@ -47,16 +47,15 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```
 2. **Run UPF-U** (new terminal)
     ```bash
-    cd NFs/onvm-upf/5gc/upf_u_complete
-    sudo ./go.sh 1
+    ./scripts/run/run_upf_u.sh 1 ./NFs/onvm-upf/5gc/upf_u_complete/upf_u.txt
     ```
 3. **Run UPF-C** (new terminal)
     ```bash
-    cd NFs/onvm-upf/5gc/upf_c_complete
-    sudo ./go.sh 2
+    ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c_complete/config/upfcfg.yaml
     ```
 4. **Run 5GC Network Functions (NFs)** (new terminal)
     ```bash
+    source ~/.bashrc
     ./scripts/run/run_cp_nfs.sh
     ```
 5. **Stop L25GC+**
