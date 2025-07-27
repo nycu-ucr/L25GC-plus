@@ -32,11 +32,9 @@ sudo bash `pwd`/cmake-3.30.1-linux-x86_64.sh
 sudo ln -s `pwd`/cmake-3.30.1-linux-x86_64/bin/* /usr/local/bin/
 # sudo ln -sf "$WORK_DIR/cmake-${CMAKE_VERSION}-linux-x86_64/bin/"* /usr/local/bin/
 
-# ----[ Clone and Build UERANSIM ]---------------------------------------------
-echo "[INFO] Cloning and building UERANSIM..."
-cd $WORK_DIR
-git clone https://github.com/aligungr/UERANSIM.git
-cd UERANSIM
-make
+# ----[ Build UERANSIM ]---------------------------------------------
+echo "[INFO] Building UERANSIM..."
+cd $WORK_DIR/L25GC-plus/UERANSIM
+make -j
 
 echo "[INFO] UERANSIM installation complete."

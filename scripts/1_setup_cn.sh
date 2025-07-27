@@ -59,12 +59,8 @@ sudo systemctl enable mongod
 sudo systemctl start mongod
 
 # ------------------------------------------------------------------------------
-# Clone and build WebConsole (from free5GC)
+# Build WebConsole (from free5GC)
 # ------------------------------------------------------------------------------
-
-echo "[INFO] Cloning free5GC repository with webconsole..."
-cd $WORK_DIR
-git clone --recursive -b v4.0.0 -j `nproc` https://github.com/free5gc/free5gc.git
 
 echo "[INFO] Installing Node.js 20.x for WebConsole..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 
@@ -77,7 +73,7 @@ export GOROOT=/usr/local/go
 export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
 echo "[INFO] Building WebConsole..."
-cd free5gc
+cd $WORK_DIR/L25GC-plus/webconsole
 make webconsole
 
 # ------------------------------------------------------------------------------
