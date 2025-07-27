@@ -34,7 +34,12 @@ sudo ln -s `pwd`/cmake-3.30.1-linux-x86_64/bin/* /usr/local/bin/
 
 # ----[ Build UERANSIM ]---------------------------------------------
 echo "[INFO] Building UERANSIM..."
-cd $WORK_DIR/L25GC-plus/UERANSIM
+cd $WORK_DIR/L25GC-plus/
+
+git submodule sync
+git submodule update --init
+
+cd UERANSIM
 make -j
 
 echo "[INFO] UERANSIM installation complete."
