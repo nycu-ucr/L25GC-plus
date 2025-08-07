@@ -15,6 +15,15 @@ For more design details, please refer to:
 - Reference topology:
     ![ref_architecture](./docs/config/ref_architecture.png)
 
+### Experiment Setup
+
+1. Configure `N2`, `N3`, and `UPF-U` on the CN node.
+2. Configure `UERANSIM` on the UE/AN node.
+3. Update IP routes and ARP settings in `scripts/set_nw_env.sh` for both UE/AN and DN nodes.
+4. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
+
+---
+
 ### Installation
 1. Run the setup script on target machine
     ```bash
@@ -29,15 +38,6 @@ For more design details, please refer to:
     sudo ~/L25GC-plus/NFs/onvm-upf/subprojects/dpdk/usertools/dpdk-devbind.py -s
     sudo ~/L25GC-plus/NFs/onvm-upf/subprojects/dpdk/usertools/dpdk-devbind.py -b igb_uio <PCIe addr>
     ```
-
----
-
-## Experiment Setup
-
-1. Configure `N2`, `N3`, and `UPF-U` on the CN node.
-2. Configure `UERANSIM` on the UE/AN node.
-3. Update IP routes and ARP settings in `scripts/set_nw_env.sh` for both UE/AN and DN nodes.
-4. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
 
 ---
 
