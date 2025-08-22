@@ -31,28 +31,39 @@ cd $WORK_DIR/L25GC-plus
 # ------------------------------------------------------------------------------
 
 echo "[INFO] Detecting Ubuntu codename..."
-UBUNTU_CODENAME=$(lsb_release -sc)
+UBUNTU_CODENAME="$(lsb_release -sc)"
 
-# Validate supported versions
-if [[ "$UBUNTU_CODENAME" != "focal" && "$UBUNTU_CODENAME" != "jammy" && "$UBUNTU_CODENAME" != "noble" ]]; then
+# Decide MongoDB major by Ubuntu release
+case "$UBUNTU_CODENAME" in
+  focal|jammy) MONGO_MAJOR="7.0" ;;
+  noble)       MONGO_MAJOR="8.0" ;;
+  *)
     echo "[ERROR] Unsupported Ubuntu release: $UBUNTU_CODENAME"
-    echo "Supported versions: 20.04 (focal), 22.04 (jammy), 24.04 (noble)"
+    echo "Supported: 20.04 (focal), 22.04 (jammy), 24.04 (noble)"
     exit 1
-fi
+    ;;
+esac
 
-echo "[INFO] Adding MongoDB 7.0 APT repository for $UBUNTU_CODENAME..."
-curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
-    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+KEYRING="/usr/share/keyrings/mongodb-server-${MONGO_MAJOR}.gpg"
+LIST="/etc/apt/sources.list.d/mongodb-org-${MONGO_MAJOR}.list"
 
-echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] \
-https://repo.mongodb.org/apt/ubuntu $UBUNTU_CODENAME/mongodb-org/7.0 multiverse" | \
-sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list > /dev/null
+echo "[INFO] Adding MongoDB ${MONGO_MAJOR} APT repository for ${UBUNTU_CODENAME}..."
+# Clean up any previous MongoDB repo entries to avoid APT errors
+sudo rm -f /etc/apt/sources.list.d/mongodb-org-*.list || true
+
+# Import the correct PGP key for this major version
+curl -fsSL "https://www.mongodb.org/static/pgp/server-${MONGO_MAJOR}.asc" \
+  | sudo gpg -o "${KEYRING}" --dearmor
+
+# Add the apt source for this Ubuntu release and MongoDB major
+echo "deb [ arch=amd64,arm64 signed-by=${KEYRING} ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/${MONGO_MAJOR} multiverse" \
+  | sudo tee "${LIST}" > /dev/null
 
 echo "[INFO] Updating package index..."
-sudo apt update
+sudo apt-get update -y
 
-echo "[INFO] Installing MongoDB 7.0..."
-sudo apt install -y mongodb-org
+echo "[INFO] Installing MongoDB ${MONGO_MAJOR}..."
+sudo apt-get install -y mongodb-org
 
 echo "[INFO] Enabling and starting MongoDB service..."
 sudo systemctl enable mongod
