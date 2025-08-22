@@ -36,8 +36,6 @@ git submodule update --init
 # ------------------------------------------------------------------------------
 
 cd $HOME/L25GC-plus/NFs/onvm-upf
-# git checkout opensource
-git checkout tmp-merge
 
 git submodule sync
 git submodule update --init
