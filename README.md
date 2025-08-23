@@ -112,8 +112,6 @@ This script assumes the `L25GC-plus/UERANSIM` folder is your working directory.
 | Ubuntu 20.04    | ✅ Works out of the box       | All dependencies available via `apt` or `pip`  |
 | Ubuntu 18.04    | ⚠️ Untested                   | Likely requires upgrading GCC, Python, and installing recent Meson manually |
 
-> 💡 For Ubuntu 20.04: See [MANUAL_INSTALL.md](./MANUAL_INSTALL.md#additional-setups-on-ubuntu-2004) to install a `pkg-config` file for `libnuma` and upgrade `meson`.
-
 ---
 
 ## Dependency Versions
