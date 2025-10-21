@@ -21,7 +21,7 @@
 [submodule "NFs/smf"]
 	path = NFs/smf
 	url = https://github.com/nycu-ucr/smf.git
-	branch = next
+	branch = feat/nr-dc
 [submodule "NFs/udm"]
 	path = NFs/udm
 	url = https://github.com/nycu-ucr/udm.git
