@@ -1,0 +1,13 @@
+# IP Address: Service ID
+IPIDMap:
+  127.0.0.1:  11  # AMF, NGAP
+  127.0.0.18: 11  # AMF, port 8000
+  127.0.0.9:  12  # AUSF, port 8000
+  127.0.0.10: 6   # NRF, port 8000
+  127.0.0.31: 4   # NSSF
+  127.0.0.7:  5   # PCF, port 8000
+  127.0.0.2:  3   # SMF
+  127.0.0.4:  7   # UDR, port 8000
+  127.0.0.3:  8   # UDM, port 8000
+  127.0.0.5:  9   # TMP, test script use
+  127.0.0.8:  2   # UPF-C, N4 interface
