@@ -50,11 +50,11 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```
 2. **Run UPF-U** (new terminal)
     ```bash
-    ./scripts/run/run_upf_u.sh 1 ./NFs/onvm-upf/5gc/upf_u_complete/upf_u.txt
+    ./scripts/run/run_upf_u.sh 1 ./NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
     ```
 3. **Run UPF-C** (new terminal)
     ```bash
-    ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c_complete/config/upfcfg.yaml
+    ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c/config/upfcfg.yaml
     ```
 4. **Run Control Plane NFs** (new terminal)
     ```bash
