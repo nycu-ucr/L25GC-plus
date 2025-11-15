@@ -56,10 +56,18 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```bash
     ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c_complete/config/upfcfg.yaml
     ```
-4. **Run 5GC Network Functions (NFs)** (new terminal)
+4. **Run Control Plane NFs** (new terminal)
     ```bash
     source ~/.bashrc
     ./scripts/run/run_cp_nfs.sh
+    ```
+    > **View Control Plane NF logs live:**
+    ```bash
+    tail -f log/*.log
+    ```
+    > **Note**: If your terminal becomes visually corrupted (e.g., broken prompt, arrow keys not working), you can restore it using:
+    ```bash
+    reset
     ```
 5. **Run Webconsole** (new terminal)
     > The webconsole is used to pre-store UE info in MongoDB for authentication and configure QoS.
