@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
-NF_NAME=nrf sudo -E taskset -c 5 ./bin/nrf &
-sleep 2
-NF_NAME=amf sudo -E taskset -c 6 ./bin/amf &
-sleep 2
-NF_NAME=smf sudo -E taskset -c 7 ./bin/smf &
-sleep 2
-NF_NAME=udr sudo -E taskset -c 8 ./bin/udr &
-sleep 2
-NF_NAME=pcf sudo -E taskset -c 9 ./bin/pcf &
-sleep 2
-NF_NAME=udm sudo -E taskset -c 10 ./bin/udm &
-sleep 2
-NF_NAME=nssf sudo -E taskset -c 11 ./bin/nssf &
-sleep 2
-NF_NAME=ausf sudo -E taskset -c 12 ./bin/ausf &
-sleep 2
-NF_NAME=chf sudo -E taskset -c 13 ./bin/chf &
-sleep 2
+
+run_nf() {
+    local name=$1
+    local core=$2
+    echo "Starting $name on core $core..."
+    NF_NAME=$name sudo -E taskset -c $core ./bin/$name > log/${name}.log 2>&1 &
+    sleep 2
+}
+
+mkdir -p log
+
+run_nf nrf 5
+run_nf amf 6
+run_nf smf 7
+run_nf udr 8
+run_nf pcf 9
+run_nf udm 10
+run_nf nssf 11
+run_nf ausf 12
+run_nf chf 13
+
+echo "All NFs started. Logs are in ./log/"
