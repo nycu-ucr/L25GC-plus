@@ -19,7 +19,7 @@ function usage {
     echo "  $0 DPDK_ARGS -- ONVM_ARGS -- NF_ARGS"
     echo ""
     echo "Examples:"
-    echo "  $0 1 -f path/to/upf_u.txt # Launch UPF-U with service ID 1"
+    echo "  $0 1 -f path/to/upf_u.yaml # Launch UPF-U with service ID 1"
     exit 1
 }
 
@@ -31,7 +31,7 @@ fi
 
 # Set working directory and default UPF-U path
 WORK_DIR=$HOME
-DEFAULT_UPF_U_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf/build/5gc/l25gc_upf_u_complete"
+DEFAULT_UPF_U_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf/build/5gc/l25gc_upf_u"
 
 # Default DPDK args
 DPDK_BASE_ARGS="-n 3 --proc-type=secondary"

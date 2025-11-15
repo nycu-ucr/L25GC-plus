@@ -65,12 +65,12 @@ change "MongoDBUrl" from 127.0.0.1 to the ip address of db container
     ```
 2. **Run UPF-U** (new terminal)
     ```bash
-    cd ~/onvm/onvm-upf/5gc/upf_u_complete
+    cd ~/onvm/onvm-upf/5gc/upf_u
     sudo ./go.sh 1
     ```
 3. **Run UPF-C** (new terminal)
     ```bash
-    cd ~/onvm/onvm-upf/5gc/upf_c_complete
+    cd ~/onvm/onvm-upf/5gc/upf_c
     sudo ./go.sh 2
     ```
 4. **Run 5GC Network Functions (NFs)** (new terminal)

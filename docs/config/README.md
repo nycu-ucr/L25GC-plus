@@ -8,7 +8,7 @@ In L25GC-plus VM, we need to edit three files:
 
 - `~/L25GC-plus/config/amfcfg.yaml`
 - `~/L25GC-plus/config/smfcfg.yaml`
-- `~/onvm/onvm-upf/5gc/upf_u_complete/upf_u.txt`
+- `~/onvm/onvm-upf/5gc/upf_u/upf_u.yaml`
 
 First SSH into L25GC-plus VM, and change `~/L25GC-plus/config/amfcfg.yaml`:
 ```
@@ -50,7 +50,7 @@ into:
        - 192.168.1.2  # 127.0.0.8
 ```
 
-Next edit `~/onvm/onvm-upf/5gc/upf_u_complete/upf_u.txt`:
+Next edit `~/onvm/onvm-upf/5gc/upf_u/upf_u.yaml`:
 
 ```
 # DN MAC Address
