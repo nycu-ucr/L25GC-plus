@@ -3227,7 +3227,7 @@ func BuildCellTrafficTrace(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU
 	return pdu
 }
 
-func buildPDUSessionResourceSetupResponseTransfer(ipv4 string) (data ngapType.PDUSessionResourceSetupResponseTransfer) {
+func buildPDUSessionResourceSetupResponseTransfer(ipv4 string, teid uint32) (data ngapType.PDUSessionResourceSetupResponseTransfer) {
 
 	// QoS Flow per TNL Information
 	qosFlowPerTNLInformation := &data.DLQosFlowPerTNLInformation
@@ -3237,7 +3237,13 @@ func buildPDUSessionResourceSetupResponseTransfer(ipv4 string) (data ngapType.PD
 	upTransportLayerInformation := &qosFlowPerTNLInformation.UPTransportLayerInformation
 	upTransportLayerInformation.Present = ngapType.UPTransportLayerInformationPresentGTPTunnel
 	upTransportLayerInformation.GTPTunnel = new(ngapType.GTPTunnel)
-	upTransportLayerInformation.GTPTunnel.GTPTEID.Value = aper.OctetString("\x00\x00\x00\x01")
+	// Convert uint32 TEID to 4-byte OctetString
+	teidBytes := make([]byte, 4)
+	teidBytes[0] = byte(teid >> 24)
+	teidBytes[1] = byte(teid >> 16)
+	teidBytes[2] = byte(teid >> 8)
+	teidBytes[3] = byte(teid)
+	upTransportLayerInformation.GTPTunnel.GTPTEID.Value = aper.OctetString(teidBytes)
 	upTransportLayerInformation.GTPTunnel.TransportLayerAddress = ngapConvert.IPAddressToNgap(ipv4, "")
 
 	// Associated QoS Flow List in QoS Flow per TNL Information
@@ -3525,7 +3531,16 @@ func buildSourceToTargetTransparentTransfer(
 }
 
 func GetPDUSessionResourceSetupResponseTransfer(ipv4 string) []byte {
-	data := buildPDUSessionResourceSetupResponseTransfer(ipv4)
+	data := buildPDUSessionResourceSetupResponseTransfer(ipv4, 1)
+	encodeData, err := aper.MarshalWithParams(data, "valueExt")
+	if err != nil {
+		fatal.Fatalf("aper MarshalWithParams error in GetPDUSessionResourceSetupResponseTransfer: %+v", err)
+	}
+	return encodeData
+}
+
+func GetPDUSessionResourceSetupResponseTransferWithTeid(ipv4 string, teid uint32) []byte {
+	data := buildPDUSessionResourceSetupResponseTransfer(ipv4, teid)
 	encodeData, err := aper.MarshalWithParams(data, "valueExt")
 	if err != nil {
 		fatal.Fatalf("aper MarshalWithParams error in GetPDUSessionResourceSetupResponseTransfer: %+v", err)
@@ -3720,7 +3735,7 @@ func BuildInitialContextSetupResponseForRegistraionTest(amfUeNgapID, ranUeNgapID
 }
 
 func BuildPDUSessionResourceSetupResponseForRegistrationTest(
-	pduSessionId int64, amfUeNgapID, ranUeNgapID int64, ipv4 string) (pdu ngapType.NGAPPDU) {
+	pduSessionId int64, amfUeNgapID, ranUeNgapID int64, ipv4 string, teid uint32) (pdu ngapType.NGAPPDU) {
 
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
@@ -3773,7 +3788,7 @@ func BuildPDUSessionResourceSetupResponseForRegistrationTest(
 	pDUSessionResourceSetupItemSURes.PDUSessionID.Value = pduSessionId
 
 	pDUSessionResourceSetupItemSURes.PDUSessionResourceSetupResponseTransfer =
-		GetPDUSessionResourceSetupResponseTransfer(ipv4)
+		GetPDUSessionResourceSetupResponseTransferWithTeid(ipv4, teid)
 
 	pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List, pDUSessionResourceSetupItemSURes)
 

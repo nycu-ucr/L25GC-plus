@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"sync"
 	"syscall"
 	"test"
@@ -28,11 +29,31 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	ranN2Ipv4Addr string = "127.0.0.1"
-	amfN2Ipv4Addr string = "127.0.0.18"
-	ranN3Ipv4Addr string = "10.100.200.1"
+// Network configuration - can be overridden via environment variables
+var (
+	ranN2Ipv4Addr string = getEnvOrDefault("RAN_N2_IP", "127.0.0.1")
+	amfN2Ipv4Addr string = getEnvOrDefault("AMF_N2_IP", "127.0.0.18")
+	ranN3Ipv4Addr string = getEnvOrDefault("RAN_N3_IP", "10.100.200.1")
+	ranTeid       uint32 = getEnvOrDefaultUint32("RAN_TEID", 1)
 )
+
+// Helper function to get environment variable or return default value
+func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+// Helper function to get uint32 environment variable or return default value
+func getEnvOrDefaultUint32(key string, defaultValue uint32) uint32 {
+	if value := os.Getenv(key); value != "" {
+		if intVal, err := strconv.ParseUint(value, 10, 32); err == nil {
+			return uint32(intVal)
+		}
+	}
+	return defaultValue
+}
 
 type Container struct {
 	mu      sync.Mutex

@@ -47,7 +47,12 @@ func GetInitialContextSetupResponseForServiceRequest(
 }
 
 func GetPDUSessionResourceSetupResponse(pduSessionId int64, amfUeNgapID int64, ranUeNgapID int64, ipv4 string) ([]byte, error) {
-	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessionId, amfUeNgapID, ranUeNgapID, ipv4)
+	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessionId, amfUeNgapID, ranUeNgapID, ipv4, 1)
+	return ngap.Encoder(message)
+}
+
+func GetPDUSessionResourceSetupResponseWithTeid(pduSessionId int64, amfUeNgapID int64, ranUeNgapID int64, ipv4 string, teid uint32) ([]byte, error) {
+	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessionId, amfUeNgapID, ranUeNgapID, ipv4, teid)
 	return ngap.Encoder(message)
 }
 func EncodeNasPduWithSecurity(ue *RanUeContext, pdu []byte, securityHeaderType uint8,

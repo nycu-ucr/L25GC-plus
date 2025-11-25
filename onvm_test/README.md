@@ -38,6 +38,37 @@ PAGING_TYPE=L25GC go test -v handover_test.go registration_test.go paging_test.g
 # - registration_test.go provides shared functions like EstablishPduSession
 ```
 
+### Network Configuration
+
+Customize network IP addresses and TEID via environment variables:
+
+```bash
+# Set custom IP addresses and TEID (defaults shown)
+export RAN_N2_IP="127.0.0.1"      # RAN N2 interface (NGAP)
+export AMF_N2_IP="127.0.0.18"     # AMF N2 interface (NGAP) this is in ./will_lin/L25GC-plus/config/amfcfg.yaml
+export RAN_N3_IP="10.100.200.1"   # RAN N3 interface (GTP-U)
+export RAN_TEID="1"               # RAN Tunnel Endpoint ID (GTP-U)
+
+# Example: Run test with custom IPs and TEID
+AMF_N2_IP="192.168.1.100" RAN_N2_IP="192.168.1.50" RAN_TEID="1" \
+  go test -v handover_test.go registration_test.go -run TestRegistration
+```
+
+### Convenience Script
+
+Use the helper script for easier test execution:
+
+```bash
+# Run with defaults
+./run_test.sh TestRegistration
+
+# Run with custom IPs and TEID (optional)
+./run_test.sh TestRegistration 127.0.0.18 127.0.0.1 10.100.200.1 100
+
+# Run handover test
+./run_test.sh TestN2Handover
+```
+
 
 ## Notes
 

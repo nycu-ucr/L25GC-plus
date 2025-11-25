@@ -469,7 +469,7 @@ func TestRegistration(t *testing.T) {
 	fmt.Println(ngapPdu)
 
 	// send 14. NGAP-PDU Session Resource Setup Response
-	sendMsg, err = test.GetPDUSessionResourceSetupResponse(10, ue.AmfUeNgapId, ue.RanUeNgapId, ranN3Ipv4Addr)
+	sendMsg, err = test.GetPDUSessionResourceSetupResponseWithTeid(10, ue.AmfUeNgapId, ue.RanUeNgapId, ranN3Ipv4Addr, ranTeid)
 	assert.Nil(t, err)
 	_, err = conn.Write(sendMsg)
 	assert.Nil(t, err)
@@ -594,7 +594,7 @@ func EstablishPduSession(t *testing.T, conn *sctp.SCTPConn, ue *test.RanUeContex
 	atomic.AddUint64(&pdu_sucess_counter, 1)
 
 	// send 14. NGAP-PDU Session Resource Setup Response
-	sendMsg, err = test.GetPDUSessionResourceSetupResponse(10, ue.AmfUeNgapId, ue.RanUeNgapId, ranN3Ipv4Addr)
+	sendMsg, err = test.GetPDUSessionResourceSetupResponseWithTeid(10, ue.AmfUeNgapId, ue.RanUeNgapId, ranN3Ipv4Addr, ranTeid)
 	assert.Nil(t, err)
 	_, err = conn.Write(sendMsg)
 	assert.Nil(t, err)
