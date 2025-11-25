@@ -28,6 +28,7 @@ type RanUeContext struct {
 	KnasEnc            [16]uint8
 	KnasInt            [16]uint8
 	Kamf               []uint8
+	AnType             models.AccessType
 	Tmsi               string
 	PduAddress         string
 	AuthenticationSubs models.AuthenticationSubscription
@@ -92,13 +93,29 @@ func GetSmPolicyData() (smPolicyData models.SmPolicyData) {
 	return TestRegistrationProcedure.TestSmPolicyDataTable[TestRegistrationProcedure.FREE5GC_CASE]
 }
 
-func NewRanUeContext(supi string, ranUeNgapId int64, cipheringAlg, integrityAlg uint8) *RanUeContext {
+func NewRanUeContext(supi string, ranUeNgapId int64, cipheringAlg, integrityAlg uint8, anType ...models.AccessType) *RanUeContext {
 	ue := RanUeContext{}
 	ue.RanUeNgapId = ranUeNgapId
 	ue.Supi = supi
 	ue.CipheringAlg = cipheringAlg
 	ue.IntegrityAlg = integrityAlg
+	// Default to 3GPP access if not specified (backward compatible)
+	if len(anType) > 0 {
+		ue.AnType = anType[0]
+	} else {
+		ue.AnType = models.AccessType__3_GPP_ACCESS
+	}
 	return &ue
+}
+
+func (ue *RanUeContext) GetBearerType() uint8 {
+	if ue.AnType == models.AccessType__3_GPP_ACCESS {
+		return security.Bearer3GPP
+	} else if ue.AnType == models.AccessType_NON_3_GPP_ACCESS {
+		return security.BearerNon3GPP
+	} else {
+		return security.OnlyOneBearer
+	}
 }
 
 func (ue *RanUeContext) DeriveRESstarAndSetKey(
