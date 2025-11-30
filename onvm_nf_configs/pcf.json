@@ -7,6 +7,6 @@
         "onvm": {
                 "output": "stdout",
                 "serviceid": 5,
-                "instanceid": 5
+                "instanceid": 6
         }
 }
