@@ -35,7 +35,7 @@ DEFAULT_UPF_C_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf/build/5gc/l25gc_upf_c"
 
 # Default DPDK args
 DPDK_BASE_ARGS="-n 3 --proc-type=secondary"
-DEFAULT_CORE_ID=0
+DEFAULT_CORE_ID=4
 
 # Verify the NF binary exists
 if [ ! -f "$DEFAULT_UPF_C_PATH" ]; then
