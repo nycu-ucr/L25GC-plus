@@ -374,14 +374,14 @@ func TestPaging(t *testing.T) {
 
 	// time.Sleep(1 * time.Second)
 
-	PagingLogger.Warnln("[Waiting To Receive Paing From AMF]")
-	// receive paing from AMF
+	PagingLogger.Warnln("[Waiting To Receive Paging From AMF]")
+	// receive Paging from AMF
 	n, err = conn.Read(recvMsg)
 	assert.Nil(t, err)
 	if err == nil {
-		PagingLogger.Info("Receive paing from AMF")
+		PagingLogger.Info("Receive Paging from AMF")
 	} else {
-		PagingLogger.Error("Receive paing from AMF")
+		PagingLogger.Error("Receive Paging from AMF")
 	}
 	_, err = ngap.Decoder(recvMsg[:n])
 	assert.Nil(t, err)
@@ -754,18 +754,18 @@ func SinglePaging(idx int, data MobileIdentityGroup, signal_chan chan string, t 
 
 	// time.Sleep(1 * time.Second)
 
-	PagingLogger.Warnln("[Waiting To Receive Paing From AMF]")
+	PagingLogger.Warnln("[Waiting To Receive Paging From AMF]")
 	for {
-		// receive paing from AMF
+		// receive Paging from AMF
 		n, err = conn.Read(recvMsg)
 		assert.Nil(t, err)
 		ngapPdu, err = ngap.Decoder(recvMsg[:n])
 		assert.Nil(t, err)
 		who, err := test.GetTmsiFromPaging(ue, ngapPdu.InitiatingMessage.Value.Paging)
 		assert.Nil(t, err)
-		PagingLogger.Tracef("(%v) CN send paing to %v\n", ue.Tmsi, who)
+		PagingLogger.Tracef("(%v) CN send Paging to %v\n", ue.Tmsi, who)
 		if who == ue.Tmsi {
-			PagingLogger.Infof("Receive Paing From AMF (%v)\n", ue.Tmsi)
+			PagingLogger.Infof("Receive Paging From AMF (%v)\n", ue.Tmsi)
 			break
 		}
 	}
@@ -916,7 +916,7 @@ func TestMultiPagingConcurrent(t *testing.T) {
 	wg.Wait()
 
 	close(paging_latency_chan)
-	time.Sleep(2 * time.Second) // Let FileLogger have encough time to write data
+	time.Sleep(2 * time.Second) // Let FileLogger have enough time to write data
 	fmt.Println("MultiPagingConcurrent Done")
 }
 func TestTriggerPaging(t *testing.T) {

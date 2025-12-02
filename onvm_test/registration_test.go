@@ -1031,6 +1031,6 @@ func TestMultiRegistrationConcurrent(t *testing.T) {
 
 	close(reg_latency_chan)
 	close(pdu_latency_chan)
-	time.Sleep(5 * time.Second) // Let FileLogger have encough time to write data
+	time.Sleep(5 * time.Second) // Let FileLogger have enough  time to write data
 	fmt.Println("MultiRegistrationConcurrent Done: ", pdu_sucess_counter)
 }
