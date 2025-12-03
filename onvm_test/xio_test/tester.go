@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"test"
 	"time"
 
@@ -15,10 +16,19 @@ import (
 	"github.com/nycu-ucr/onvmpoller"
 )
 
-const ranN2Ipv4Addr string = "127.0.0.1"
-const amfN2Ipv4Addr string = "127.0.0.18"
-const ranN3Ipv4Addr string = "10.100.200.1"
-const upfN3Ipv4Addr string = "10.100.200.3"
+// Network configuration - can be overridden via environment variables
+var ranN2Ipv4Addr string = getEnvOrDefault("RAN_N2_IP", "127.0.0.1")
+var amfN2Ipv4Addr string = getEnvOrDefault("AMF_N2_IP", "127.0.0.18")
+var ranN3Ipv4Addr string = getEnvOrDefault("RAN_N3_IP", "10.100.200.1")
+var upfN3Ipv4Addr string = getEnvOrDefault("UPF_N3_IP", "10.100.200.3")
+
+// Helper function to get environment variable or return default value
+func getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
 
 const RegLog string = "[TEST][TestRegistration] "
 const HandLog string = "[TEST][TestN2Handover] "

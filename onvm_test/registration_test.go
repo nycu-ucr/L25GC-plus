@@ -737,7 +737,7 @@ func SingleRegistration(idx int, data MobileIdentityGroup, t *testing.T) (string
 	assert.Nil(t, err)
 	logMsg = fmt.Sprintf("(%v) Send Initial UE Message, (%v)", conn.LocalAddr(), data.supi)
 	if err == nil {
-		RegLogger.Infof(logMsg)
+		RegLogger.Infof("(%v) Send Initial UE Message, (%v)", conn.LocalAddr(), data.supi)
 	} else {
 		RegLogger.Error(logMsg)
 	}
@@ -747,7 +747,7 @@ func SingleRegistration(idx int, data MobileIdentityGroup, t *testing.T) (string
 	assert.Nil(t, err)
 	logMsg = fmt.Sprintf("(%v) Receive NAS Authentication Request Msg, (%v)", conn.LocalAddr(), data.supi)
 	if err == nil {
-		RegLogger.Infof(logMsg)
+		RegLogger.Infof("(%v) Receive NAS Authentication Request Msg, (%v)", conn.LocalAddr(), data.supi)
 	} else {
 		RegLogger.Error(logMsg)
 	}
@@ -792,7 +792,7 @@ func SingleRegistration(idx int, data MobileIdentityGroup, t *testing.T) (string
 	if err == nil {
 		RegLogger.Info(logMsg)
 	} else {
-		RegLogger.Errorf(logMsg)
+		RegLogger.Errorf("(%v) Receive NAS Security Mode Command Msg, (%v)", conn.LocalAddr(), data.supi)
 	}
 	ngapPdu, err = ngap.Decoder(recvMsg[:n])
 	assert.Nil(t, err)
