@@ -9,18 +9,26 @@ set -e
 WORK_DIR=$HOME
 DEFAULT_ONVM_MGR_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf"
 
-DEFAULT_CORE_ID="3"
-DEFAULT_PORTMASK="0xFFF8"
+
+# Defaults:
+# - Manager cores (in start.sh) default to 0,1,2 if -m is not passed
+# - Here we only set:
+#     -k PORTMASK     (which NIC ports)
+#     -n NF_COREMASK  (which cores ONVM can use for NFs)
+DEFAULT_PORTMASK="3"
+DEFAULT_NF_COREMASK="0xFFF8"
 DEFAULT_OUTPUT="stdout"
 
 # Usage function
 usage() {
-  echo "Usage: $0 [-p ONVM_MGR_PATH] [-k CORE_ID] [-n PORTMASK] [-s OUTPUT]"
+  echo "Usage: $0 [-p ONVM_MGR_PATH] [-k PORTMASK] [-n NF_COREMASK] [-s OUTPUT]"
   echo
   echo "  -p ONVM_MGR_PATH   Path to ONVM-UPF (default: $DEFAULT_ONVM_MGR_PATH)"
-  echo "  -k CORE_ID    Core ID to assign (default: $DEFAULT_CORE_ID)"
-  echo "  -n PORTMASK   DPDK portmask (default: $DEFAULT_PORTMASK)"
-  echo "  -s OUTPUT     Output mode (default: $DEFAULT_OUTPUT)"
+  echo "  -k PORTMASK        DPDK portmask passed to start.sh -k (default: $DEFAULT_PORTMASK)"
+  echo "                     Example: 3 -> use ports 0 and 1"
+  echo "  -n NF_COREMASK     NF coremask passed to start.sh -n (default: $DEFAULT_NF_COREMASK)"
+  echo "                     Example: 0xF0 -> cores 4-7 for NFs"
+  echo "  -s OUTPUT          Stats/output mode (web|stdout) (default: $DEFAULT_OUTPUT)"
   exit 1
 }
 
@@ -28,8 +36,8 @@ usage() {
 while getopts "p:k:n:s:h" opt; do
   case $opt in
     p) ONVM_MGR_PATH="$OPTARG" ;;
-    k) CORE_ID="$OPTARG" ;;
-    n) PORTMASK="$OPTARG" ;;
+    k) PORTMASK="$OPTARG" ;;
+    n) NF_COREMASK="$OPTARG" ;;
     s) OUTPUT="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
@@ -38,8 +46,8 @@ done
 
 # Apply defaults if not provided
 ONVM_MGR_PATH="${ONVM_MGR_PATH:-$DEFAULT_ONVM_MGR_PATH}"
-CORE_ID="${CORE_ID:-$DEFAULT_CORE_ID}"
 PORTMASK="${PORTMASK:-$DEFAULT_PORTMASK}"
+NF_COREMASK="${NF_COREMASK:-$DEFAULT_NF_COREMASK}"
 OUTPUT="${OUTPUT:-$DEFAULT_OUTPUT}"
 
 # Check that the directory exists
@@ -56,5 +64,5 @@ cd "$ONVM_MGR_PATH"
 sleep 1.0
 
 # Launch ONVM_MGR with specified arguments
-echo "[INFO] Starting ONVM_MGR with options: -k $CORE_ID -n $PORTMASK -s $OUTPUT"
-./scripts/start.sh -k "$CORE_ID" -n "$PORTMASK" -s "$OUTPUT"
+echo "[INFO] Starting ONVM_MGR with options: -k $PORTMASK -n $NF_COREMASK -s $OUTPUT"
+./scripts/start.sh -k "$PORTMASK" -n "$NF_COREMASK" -s "$OUTPUT"
