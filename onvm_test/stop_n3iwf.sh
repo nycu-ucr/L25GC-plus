@@ -11,7 +11,7 @@ echo ""
 if [ -f n3iwf_test.pid ]; then
     PID=$(cat n3iwf_test.pid)
     if ps -p $PID > /dev/null 2>&1; then
-        echo "[1/3] Stopping N3IWF (PID: $PID)..."
+        echo "[1/4] Stopping N3IWF (PID: $PID)..."
         sudo kill $PID 2>/dev/null
         sleep 2
         # Force kill if still running
@@ -26,18 +26,40 @@ if [ -f n3iwf_test.pid ]; then
     rm -f n3iwf_test.pid
 else
     echo "⚠️  PID file not found, trying to kill by name..."
-    sudo pkill -f "n3iwf.*n3iwfcfg_test.yaml" 2>/dev/null || true
-    sleep 1
 fi
 
+# Kill any remaining N3IWF processes (comprehensive cleanup)
+echo "[2/4] Killing any remaining N3IWF processes..."
+sudo pkill -9 -f "n3iwf.*n3iwfcfg_test.yaml" 2>/dev/null || true
+sudo pkill -9 -f "n3iwf.*config/n3iwfcfg_test" 2>/dev/null || true
+sudo pkill -9 n3iwf 2>/dev/null || true
+sleep 1
+
+# Check if port 20000 is still in use and kill the process
+if sudo lsof -ti :20000 > /dev/null 2>&1; then
+    echo "⚠️  Port 20000 still in use, killing process..."
+    sudo kill -9 $(sudo lsof -ti :20000) 2>/dev/null || true
+    sleep 1
+fi
+echo "✓ All N3IWF processes cleaned"
+
 # Clean up network interface
-echo "[2/3] Cleaning up network interface..."
+echo "[3/4] Cleaning up network interface..."
 sudo ip link del n3iwf-ue 2>/dev/null || true
 echo "✓ Network interface removed"
 
 # Clean up XFRM interface and policies
-echo "[3/3] Cleaning up XFRM interface and policies..."
+echo "[4/4] Cleaning up XFRM interface and policies..."
+# Force down and delete xfrmi-default (critical for restart!)
+sudo ip link set xfrmi-default down 2>/dev/null || true
+sleep 0.5
 sudo ip link del xfrmi-default 2>/dev/null || true
+sleep 0.5
+# Verify it's gone
+if ip link show xfrmi-default > /dev/null 2>&1; then
+    echo "⚠️  Warning: xfrmi-default still exists, forcing deletion..."
+    sudo ip link del xfrmi-default 2>/dev/null || true
+fi
 sudo ip xfrm policy flush 2>/dev/null || true
 sudo ip xfrm state flush 2>/dev/null || true
 echo "✓ XFRM interface and policies cleaned"
