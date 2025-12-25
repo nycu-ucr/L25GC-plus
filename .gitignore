@@ -1,2 +1,9 @@
 bin/*
 log/*
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
