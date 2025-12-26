@@ -24,6 +24,18 @@ fi
 echo "✓ N3IWF is running (PID: $PID)"
 echo ""
 
+# Clean up old XFRM rules and interfaces (from previous test runs)
+echo "Cleaning up old XFRM rules and interfaces..."
+sudo ip xfrm policy flush 2>/dev/null
+sudo ip xfrm state flush 2>/dev/null
+# Delete old XFRM interfaces
+sudo ip link del xfrmi-default 2>/dev/null || true
+for iface in $(ip link show | grep "ipsec-test-" | cut -d: -f2 | cut -d@ -f1 | tr -d ' ' 2>/dev/null); do
+    sudo ip link del "$iface" 2>/dev/null || true
+done
+echo "✓ XFRM rules and interfaces cleaned"
+echo ""
+
 # Set up Go environment
 export GOPATH=$HOME/go
 export GOROOT=/usr/local/go

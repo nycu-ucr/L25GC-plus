@@ -19,6 +19,18 @@ if [ -f n3iwf_test.pid ]; then
     fi
 fi
 
+# Check if port 20000 is in use (leftover from previous crash)
+if sudo lsof -ti :20000 > /dev/null 2>&1; then
+    echo "⚠️  Port 20000 is in use by another process. Cleaning up..."
+    sudo kill -9 $(sudo lsof -ti :20000) 2>/dev/null || true
+    sleep 1
+    echo "✓ Port 20000 freed"
+fi
+
+# Kill any remaining N3IWF processes
+sudo pkill -9 -f "n3iwf.*n3iwfcfg_test" 2>/dev/null || true
+sleep 1
+
 # Setup network interface
 echo "[1/4] Setting up network interface..."
 sudo ip link add name n3iwf-ue type dummy 2>/dev/null || true
@@ -29,9 +41,20 @@ echo "✓ Network interface ready"
 
 # Clean up any existing XFRM interface (from previous runs)
 echo "[2/5] Cleaning up old XFRM interface..."
+# CRITICAL: Force delete xfrmi-default before N3IWF tries to create it
+sudo ip link set xfrmi-default down 2>/dev/null || true
+sleep 0.5
 sudo ip link del xfrmi-default 2>/dev/null || true
+sleep 0.5
+# Double check it's gone
+if ip link show xfrmi-default > /dev/null 2>&1; then
+    echo "⚠️  xfrmi-default still exists! Forcing deletion..."
+    sudo ip -force link del xfrmi-default 2>/dev/null || true
+    sleep 1
+fi
 sudo ip xfrm policy flush 2>/dev/null || true
 sudo ip xfrm state flush 2>/dev/null || true
+echo "✓ XFRM cleaned"
 
 # Load kernel modules
 echo "[3/5] Loading kernel modules..."
@@ -48,6 +71,13 @@ fi
 if [ ! -f ../free5gc/NFs/n3iwf/n3iwf ]; then
     echo "✗ N3IWF binary not found"
     echo "Build it with: cd ../free5gc/NFs/n3iwf && go build -o n3iwf cmd/main.go"
+    exit 1
+fi
+
+# Final verification that xfrmi-default is gone
+if ip link show xfrmi-default > /dev/null 2>&1; then
+    echo "✗ CRITICAL: xfrmi-default still exists! N3IWF will fail to start."
+    echo "  Manually delete it: sudo ip link del xfrmi-default"
     exit 1
 fi
 
