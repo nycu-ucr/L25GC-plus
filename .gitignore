@@ -1,2 +1,14 @@
 bin/*
 log/*
+# Temporary documentation backups
+onvm_test/.doc_backup/
+
+# Test artifacts
+*.test
+*.log
+*.pid
+test_*.log
+
+# Generated certificates (keep originals)
+cert/*_[0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.pem
+

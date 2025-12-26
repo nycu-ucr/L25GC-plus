@@ -11,18 +11,24 @@ Test suite for validating L25GC+ 5G Core Network Functions.
 | `paging_test.go` | ✅ **Working** | Paging procedure for mobile-terminated services | Fully functional |
 | `non3gpp_test.go` | 🚧 **WIP** | Non-3GPP access procedures (e.g., WLAN) | WIP |
 
-## Quick Start
+```bash
+cd ./L25GC-plus/onvm_test
+sudo ./run_full_test.sh
+```
 
-### Prerequisites
+**See**: [`REGISTRATION_README.md`](REGISTRATION_README.md)
 
 - MongoDB running and accessible
 - L25GC+ NFs (AMF, UDM, AUSF, NRF, SMF, UDR) running
 - Go 1.19+ installed
 
-### Running Tests
+### 2. Non-3GPP Test (Wi-Fi/N3IWF)
+Untrusted network access via N3IWF.
 
 ```bash
-cd onvm_test
+cd ./L25GC-plus/onvm_test
+sudo ./RUN_NON3GPP_TEST.sh
+```
 
 # Run registration test (requires handover_test.go for shared logger declarations)
 go test -v handover_test.go registration_test.go -run TestRegistration
@@ -45,7 +51,7 @@ Customize network IP addresses and TEID via environment variables:
 ```bash
 # Set custom IP addresses and TEID (defaults shown)
 export RAN_N2_IP="127.0.0.1"      # RAN N2 interface (NGAP)
-export AMF_N2_IP="127.0.0.18"     # AMF N2 interface (NGAP) this is in ./will_lin/L25GC-plus/config/amfcfg.yaml
+export AMF_N2_IP="127.0.0.18"     # AMF N2 interface (NGAP) this is in ./L25GC-plus/config/amfcfg.yaml
 export RAN_N3_IP="10.100.200.1"   # RAN N3 interface (GTP-U)
 export RAN_TEID="1"               # RAN Tunnel Endpoint ID (GTP-U)
 
