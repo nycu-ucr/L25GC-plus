@@ -1,0 +1,59 @@
+info:
+  version: 1.0.5
+  description: N3IWF config for non3gpp_test.go
+
+configuration:
+  n3iwfInformation:
+    globalN3IWFID:
+      plmnID:
+        mcc: 208
+        mnc: 93
+      n3iwfID: 135
+    name: test_N3IWF
+    supportedTAList:
+      - tac: 000001
+        broadcastPlmnList:
+          - plmnID:
+              mcc: 208
+              mnc: 93
+            taiSliceSupportList:
+              - snssai:
+                  sst: 1
+                  sd: 010203
+              - snssai:
+                  sst: 1
+                  sd: 112233
+
+  # N2 Interface - Connect to your AMF
+  amfSCTPAddresses:
+    - ip:
+        - 127.0.0.18  # Your AMF IP
+      port: 38412
+  nasTcpPort: 20000
+
+  # Nwu Interface - FOR THE TEST (Important!)
+  ikeBindAddress: 192.168.127.1  # ← MUST be this for test!
+  ipSecTunnelAddress: 10.0.0.1
+  ueIpAddressRange: 10.0.0.0/24
+  xfrmInterfaceName: xfrmi
+  xfrmInterfaceID: 1
+
+  # N3 Interface - GTP
+  n3iwfGtpBindAddress: 127.0.0.33
+
+  fqdn: n3iwf.test.local
+
+  # Security - Self-signed certs (will generate)
+  privateKey: config/cert/n3iwf_test.key
+  certificateAuthority: config/cert/n3iwf_test.pem
+  certificate: config/cert/n3iwf_test.pem
+
+  livenessCheck:
+    enable: true
+    transFreq: 60s
+    maxRetryTimes: 4
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false
