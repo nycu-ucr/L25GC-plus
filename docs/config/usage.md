@@ -1,6 +1,8 @@
 # L25GC+ Usage Guide
 
-This guide provides step-by-step instructions for setting up and running L25GC+ from scratch and test. 
+This guide provides step-by-step instructions for setting up and running L25GC+ from scratch and test.
+
+**Video Tutorial:** [L25GC+ Setup and Usage Video](https://youtu.be/pebxk1VqWYQ)
 
 ## Table of Contents
 
