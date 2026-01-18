@@ -50,9 +50,11 @@ fi
 
 echo "install ofed 24.10"
 cd $HOME
-wget -O ofed.tgz https://content.mellanox.com/ofed/MLNX_OFED-24.10-2.1.8.0/MLNX_OFED_LINUX-24.10-2.1.8.0-ubuntu20.04-x86_64.tgz
+#wget -O ofed.tgz https://content.mellanox.com/ofed/MLNX_OFED-24.10-2.1.8.0/MLNX_OFED_LINUX-24.10-2.1.8.0-ubuntu20.04-x86_64.tgz
+wget -O ofed.tgz https://content.mellanox.com/ofed/MLNX_OFED-24.07-0.6.1.0/MLNX_OFED_LINUX-24.07-0.6.1.0-ubuntu22.04-x86_64.tgz
 tar xvf ofed.tgz
-cd MLNX_OFED_LINUX-24.10-2.1.8.0-ubuntu20.04-x86_64
+#cd MLNX_OFED_LINUX-24.10-2.1.8.0-ubuntu20.04-x86_64
+cd MLNX_OFED_LINUX-24.07-0.6.1.0-ubuntu22.04-x86_64
 sudo ./mlnxofedinstall --dpdk
 
 echo "load new driver"

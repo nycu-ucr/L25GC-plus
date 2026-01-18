@@ -15,7 +15,7 @@ DEFAULT_ONVM_MGR_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf"
 # - Here we only set:
 #     -k PORTMASK     (which NIC ports)
 #     -n NF_COREMASK  (which cores ONVM can use for NFs)
-DEFAULT_PORTMASK="3"
+DEFAULT_PORTMASK="6"
 DEFAULT_NF_COREMASK="0xFFF8"
 DEFAULT_OUTPUT="stdout"
 
