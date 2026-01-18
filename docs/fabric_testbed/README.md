@@ -158,3 +158,57 @@ Example:
 Other steps are similar to the CloudLab workflow. Please refer to:
 
 * [Running L25GC+](https://github.com/nycu-ucr/L25GC-plus/tree/main/README.md#running-l25gc)
+
+---
+
+## 5. Access the CN Web Console from Your Laptop (SSH Tunnel)
+
+If your web console service is running on the FABRIC CN node (for example on port **5000**), the recommended way to access it from your laptop is to use **SSH local port forwarding**.
+
+### Customize for your FABRIC slice
+
+The SSH command below includes **example values**. On your setup, the following fields will likely be different:
+
+* **SSH private key path** (example: `.ssh/fabric_keys/slice_key`)
+* **FABRIC SSH config file path** (example: `.ssh/fabric_ssh_config`)
+* **CN node address** (IPv6/IPv4) and sometimes the **username**
+
+### Option A: Forward `localhost:5000` → CN `localhost:5000`
+
+Run the following command on your **laptop** (replace the values above with your own):
+
+```bash
+ssh -N \
+  -i .ssh/fabric_keys/slice_key \
+  -F .ssh/fabric_ssh_config \
+  -L 5000:127.0.0.1:5000 \
+  ubuntu@2001:48d0:6031:1991:f816:3eff:fe19:8d5a
+```
+
+Then open in your laptop browser:
+
+* `http://localhost:5000`
+
+### Option B: Use a different local port (recommended if 5000 is occupied)
+
+If port 5000 on your laptop is already in use, map a different local port (e.g., **15000 → 5000**):
+
+```bash
+ssh -N \
+  -i .ssh/fabric_keys/slice_key \
+  -F .ssh/fabric_ssh_config \
+  -L 15000:127.0.0.1:5000 \
+  ubuntu@2001:48d0:6031:1991:f816:3eff:fe19:8d5a
+```
+
+Then browse:
+
+* `http://localhost:15000`
+
+### Notes
+
+* `-N` means “do not run a remote shell” (keep the session only for the tunnel).
+* `127.0.0.1` on the right-hand side forwards to the service bound on the CN node’s loopback interface.
+
+  * If your service is bound to `0.0.0.0:5000`, this still works.
+  * If your service is bound only to a specific CN interface IP, replace `127.0.0.1` with that interface IP.

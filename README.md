@@ -76,6 +76,9 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ./bin/webconsole
     ```
     See this [video]() or [doc](docs/webconsole/README.md) for usage instructions.
+
+    **Note (FABRIC):** If you run the webconsole on a FABRIC node, you usually need an SSH tunnel (local port-forward) to access it from your laptop. See [FABRIC webconsole access via SSH tunnel](docs/fabric_testbed/README.md#5-access-the-cn-web-console-from-your-laptop-ssh-tunnel).
+
 6. **Stop L25GC+**
     ```bash
     ./scripts/run/stop_cn.sh
