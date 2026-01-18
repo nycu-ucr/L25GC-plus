@@ -15,7 +15,7 @@ Test suite for validating control plane events in L25GC+.
 
 ### Prerequisites
 
-- Please deploy L25GC+ according to the [README](L25GC-plus/README.md).
+- Please deploy L25GC+ according to the [README](https://github.com/nycu-ucr/L25GC-plus/blob/main/README.md).
 - MongoDB running and accessible
 - L25GC+ NFs (AMF, UDM, AUSF, NRF, SMF, UDR) running
 - Go 1.19+ installed
@@ -77,4 +77,5 @@ We provide a helper script `run_test.sh` to abstract away the complexity:
 - Tests use MongoDB for subscription data management
 - All tests must clean up MongoDB data after execution
 - `handover.txt`, `pdu_latency.txt`, and `reg_latency.txt` files are generated for logging purposes
+
 
