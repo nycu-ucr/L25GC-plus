@@ -481,48 +481,6 @@ func TestRegistration(t *testing.T) {
 
 	t4 := time.Now()
 	fmt.Println(string(colorCyan), RegLog, string(colorGreen), "[Finish PDU Session Establishment]", string(colorReset), t4.Sub(t3).Seconds(), "(seconds)")
-	// wait 1s
-	// time.Sleep(1 * time.Second)
-	/*
-		// Send the dummy packet
-		// ping IP(tunnel IP) from 60.60.0.2(127.0.0.1) to 60.60.0.20(127.0.0.8)
-		gtpHdr, err := hex.DecodeString("32ff00340000000100000000")
-		assert.Nil(t, err)
-		icmpData, err := hex.DecodeString("8c870d0000000000101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637")
-		assert.Nil(t, err)
-
-		ipv4hdr := ipv4.Header{
-			Version:  4,
-			Len:      20,
-			Protocol: 1,
-			Flags:    0,
-			TotalLen: 48,
-			TTL:      64,
-			Src:      net.ParseIP("60.60.0.1").To4(),
-			Dst:      net.ParseIP("60.60.0.101").To4(),
-			ID:       1,
-		}
-		checksum := test.CalculateIpv4HeaderChecksum(&ipv4hdr)
-		ipv4hdr.Checksum = int(checksum)
-
-		v4HdrBuf, err := ipv4hdr.Marshal()
-		assert.Nil(t, err)
-		tt := append(gtpHdr, v4HdrBuf...)
-
-		m := icmp.Message{
-			Type: ipv4.ICMPTypeEcho, Code: 0,
-			Body: &icmp.Echo{
-				ID: 12394, Seq: 1,
-				Data: icmpData,
-			},
-		}
-		b, err := m.Marshal(nil)
-		assert.Nil(t, err)
-		b[2] = 0xaf
-		b[3] = 0x88
-		_, err = upfConn.Write(append(tt, b...))
-		assert.Nil(t, err)
-	*/
 	time.Sleep(1 * time.Second)
 
 	// delete test data
@@ -896,65 +854,6 @@ func RegistrationWorker(name string,
 	pdu_latency_chan chan time.Duration,
 	t *testing.T,
 ) {
-	// fmt.Println(name, "start")
-	// var conn *sctp.SCTPConn
-	// var sendMsg []byte
-	// var err error
-	// recvMsg := make([]byte, 2048)
-
-	// RAN connect to AMF
-	// conn, err = test.ConnectToAmf(amfN2Ipv4Addr, ranN2Ipv4Addr, 38412, int(work_data_array[0].mobile_identiy_group.port))
-	// if err != nil {
-	// 	RegLogger.Errorf("RAN connect to AMF, Error = %v, Port = %v", err.Error(), work_data_array[0].mobile_identiy_group.port)
-	// 	return
-	// }
-
-	// timeout := new(syscall.Timeval)
-	// timeout.Sec = 5
-
-	// // Set r/w timeout
-	// err = conn.SetWriteTimeout(*timeout)
-	// if err != nil {
-	// 	RegLogger.Errorf("SetWriteTimeout: %v", err)
-	// }
-	// err = conn.SetReadTimeout(*timeout)
-	// if err != nil {
-	// 	RegLogger.Errorf("SetReadTimeout: %v", err)
-	// }
-
-	// send NGSetupRequest Msg
-	// sendMsg, err = test.GetNGSetupRequest([]byte("\x00\x01\x02"), 24, "free5gc")
-	// sendMsg, err = test.GetNGSetupRequest(
-	// 	work_data_array[0].mobile_identiy_group.gnbIdInfo.id,
-	// 	work_data_array[0].mobile_identiy_group.gnbIdInfo.length,
-	// 	work_data_array[0].mobile_identiy_group.gnbIdInfo.name,
-	// )
-	// assert.Nil(t, err)
-	// _, err = conn.Write(sendMsg)
-	// assert.Nil(t, err)
-	// if err == nil {
-	// 	RegLogger.Info("Send NGSetupRequest Msg")
-	// } else {
-	// 	RegLogger.Error("Send NGSetupRequest Msg")
-	// }
-
-	// // receive NGSetupResponse Msg
-	// n, err := conn.Read(recvMsg)
-	// assert.Nil(t, err)
-	// if err == nil {
-	// 	RegLogger.Info("Receive NGSetupResponse Msg")
-	// } else {
-	// 	RegLogger.Error("Receive NGSetupResponse Msg")
-	// }
-	// ngapPdu, err := ngap.Decoder(recvMsg[:n])
-	// assert.Nil(t, err)
-	// assert.True(t,
-	// 	ngapPdu.Present == ngapType.NGAPPDUPresentSuccessfulOutcome &&
-	// 		ngapPdu.SuccessfulOutcome.ProcedureCode.Value ==
-	// 			ngapType.ProcedureCodeNGSetup,
-	// 	"No NGSetupResponse received.",
-	// )
-
 	for _, work_data := range work_data_array {
 		// fmt.Println(name, "handle id", work_data.id)
 		// _, _, reg_latency, pdu_latency := SingleRegistration(conn, work_data.id+1, work_data.mobile_identiy_group, t)
@@ -963,7 +862,6 @@ func RegistrationWorker(name string,
 		pdu_latency_chan <- pdu_latency
 	}
 	wg.Done()
-	// fmt.Println(name, "done")
 }
 
 func StringToInteger(str string) (int, error) {

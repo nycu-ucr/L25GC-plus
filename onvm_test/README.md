@@ -1,6 +1,6 @@
 # L25GC+ Test Suite
 
-Test suite for validating L25GC+ 5G Core Network Functions.
+Test suite for validating control plane events in L25GC+.
 
 ## Test Status
 
@@ -15,11 +15,12 @@ Test suite for validating L25GC+ 5G Core Network Functions.
 
 ### Prerequisites
 
+- Please deploy L25GC+ according to the [README](L25GC-plus/README.md).
 - MongoDB running and accessible
 - L25GC+ NFs (AMF, UDM, AUSF, NRF, SMF, UDR) running
 - Go 1.19+ installed
 
-### Running Tests
+### How to run the tests
 
 ```bash
 cd onvm_test
@@ -43,20 +44,20 @@ PAGING_TYPE=L25GC go test -v handover_test.go registration_test.go paging_test.g
 Customize network IP addresses and TEID via environment variables:
 
 ```bash
-# Set custom IP addresses and TEID (defaults shown)
+# Set custom IP addresses and TEID (The defaults are shown below)
 export RAN_N2_IP="127.0.0.1"      # RAN N2 interface (NGAP)
-export AMF_N2_IP="127.0.0.18"     # AMF N2 interface (NGAP) this is in ./will_lin/L25GC-plus/config/amfcfg.yaml
+export AMF_N2_IP="127.0.0.18"     # AMF N2 interface (NGAP) this is in L25GC-plus/config/amfcfg.yaml
 export RAN_N3_IP="10.100.200.1"   # RAN N3 interface (GTP-U)
 export RAN_TEID="1"               # RAN Tunnel Endpoint ID (GTP-U)
 
-# Example: Run test with custom IPs and TEID
+# Example: testing with custom IPs and TEID
 AMF_N2_IP="192.168.1.100" RAN_N2_IP="192.168.1.50" RAN_TEID="1" \
   go test -v handover_test.go registration_test.go -run TestRegistration
 ```
 
-### Convenience Script
+### Helper Script
 
-Use the helper script for easier test execution:
+We provide a helper script `run_test.sh` to abstract away the complexity:
 
 ```bash
 # Run with defaults
@@ -72,9 +73,8 @@ Use the helper script for easier test execution:
 
 ## Notes
 
-- **Important**: Both `handover_test.go` and `registration_test.go` must be included together when running tests:
-  - `handover_test.go` declares shared logger variables (`_log`, `RegLogger`, `HandoverLogger`, `PagingLogger`)
-  - `registration_test.go` provides shared functions (`EstablishPduSession`, `MobileIdentityGroup`, etc.)
+- **Important**: Both `handover_test.go` and `registration_test.go` must be included together when running tests
 - Tests use MongoDB for subscription data management
-- All tests clean up MongoDB data after execution
+- All tests must clean up MongoDB data after execution
+- `handover.txt`, `pdu_latency.txt`, and `reg_latency.txt` files are generated for logging purposes
 

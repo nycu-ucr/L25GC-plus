@@ -39,7 +39,7 @@ func NASEncode(ue *RanUeContext, msg *nas.Message, securityContextAvailable bool
 			security.DirectionUplink, payload); err != nil {
 			return
 		}
-		// add sequece number
+		// add sequence number
 		payload = append([]byte{sequenceNumber}, payload[:]...)
 		mac32 := make([]byte, 4)
 		_ = mac32
@@ -100,7 +100,7 @@ func NASDecode(ue *RanUeContext, securityHeaderType uint8, payload []byte) (msg 
 		securityHeader := payload[0:6]
 		sequenceNumber := payload[6]
 		receivedMac32 := securityHeader[2:]
-		// remove security Header except for sequece Number
+		// remove security Header except for sequence Number
 		payload = payload[6:]
 
 		// a security protected NAS message must be integrity protected, and ciphering is optional
@@ -139,7 +139,7 @@ func NASDecode(ue *RanUeContext, securityHeaderType uint8, payload []byte) (msg 
 		// 	fmt.Printf("cmac value: 0x%x\n", mac32)
 		// }
 
-		// remove sequece Number
+		// remove sequence Number
 		payload = payload[1:]
 		// TODO: Support for ue has nas connection in both accessType
 		if ciphered {
