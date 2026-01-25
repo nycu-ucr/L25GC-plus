@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 # ------------------------------------------------------------------------------
 
 cd $HOME
-sudo apt -y install cmake autoconf libtool pkg-config libmnl-dev
+sudo NEEDRESTART_MODE=a apt -y install cmake autoconf libtool pkg-config libmnl-dev
 
 # ------------------------------------------------------------------------------
 # Clone and Initialize Control Plane NFs

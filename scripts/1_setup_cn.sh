@@ -16,7 +16,7 @@ echo "[INFO] Updating system packages..."
 sudo apt update
 
 echo "[INFO] Installing essential utilities..."
-sudo apt install -y net-tools gnupg curl
+sudo NEEDRESTART_MODE=a apt install -y net-tools gnupg curl
 
 # ------------------------------------------------------------------------------
 # Clone and install L25GC+ NFs
@@ -52,7 +52,7 @@ echo "[INFO] Updating package index..."
 sudo apt update
 
 echo "[INFO] Installing MongoDB 7.0..."
-sudo apt install -y mongodb-org
+sudo NEEDRESTART_MODE=a apt install -y mongodb-org
 
 echo "[INFO] Enabling and starting MongoDB service..."
 sudo systemctl enable mongod
@@ -64,7 +64,7 @@ sudo systemctl start mongod
 
 echo "[INFO] Installing Node.js 20.x for WebConsole..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 
-sudo apt install -y nodejs
+sudo NEEDRESTART_MODE=a apt install -y nodejs
 sudo corepack enable 
 
 echo "[INFO] Setting Go environment variables..."
