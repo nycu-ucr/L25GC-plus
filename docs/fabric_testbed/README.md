@@ -5,7 +5,7 @@ This guide describes how to deploy **L25GC+ on the [NSF FABRIC testbed](https://
 1. Create a FABRIC slice using our provided artifact
 2. Log into the provisioned nodes
 3. Run setup scripts + install MLNX_OFED
-4. Apply Mellanox-specific ONVM runtime/script settings (PCI whitelist, disable binding check)
+4. Apply Mellanox-specific ONVM runtime/script settings (`--allow`, portmask, static ARP, routes)
 5. Start the ONVM manager and run experiments
 
 ---
@@ -115,6 +115,8 @@ Another example:
 
 Once you have the decimal portmask value, pass it to the ONVM manager startup script via `-k`.
 
+> **If you use `--allow` (see Section 3.2):** DPDK only sees two ports (port 0 and port 1), so the correct portmask is **`-k 3`** (binary `11`). You can skip the manual calculation above.
+
 For example (portmask decimal = 3):
 
 ```bash
@@ -126,36 +128,98 @@ For example (portmask decimal = 3):
 
 ---
 
-### 3.2 (Optional) Whitelist Mellanox NICs (PCI addresses) in ONVM manager launch
+### 3.2 Whitelist Mellanox NICs (`--allow`) in ONVM manager launch
 
-On FABRIC, Mellanox NIC PCI addresses vary by site/node. Find the NIC PCI addresses using:
+> **This step is optional.** The UPF-U forwarding code uses `pkt->port ^ 1` (XOR with 1) to swap packets between the access and core ports. This only works correctly when DPDK sees exactly **two** ports numbered 0 and 1. Without `--allow`, DPDK probes all three Mellanox NICs (ports 0, 1, 2), and the XOR logic sends packets to wrong ports.
+
+First, find the PCI addresses of your **two data-plane NICs** (N3 and N6):
 
 ```bash
 lspci | grep -i mell
+# or
+dpdk-devbind.py --status
 ```
 
-Then pass them to the ONVM manager using `-w <PCI_ADDR>` (repeat for each port), by editing the ONVM manager launch line in:
+Then pass them to the ONVM manager using `--allow <PCI_ADDR>` (repeat for each port), by editing the ONVM manager launch line in:
 
-* `$HOME/onvm/onvm-upf/onvm/go.sh`
+* `NFs/onvm-upf/scripts/start.sh`
 
 Example:
 
-```diff
-@@ -269,7 +269,7 @@ fi
- sudo rm -rf /mnt/huge/rtemap_*
- # watch out for variable expansion
- # shellcheck disable=SC2086
--sudo "$SCRIPTPATH"/onvm_mgr/"$RTE_TARGET"/onvm_mgr -l "$cpu" -n 4 --proc-type=primary ${virt_addr} -- -p ${ports} -n ${nf_cores} ${num_srvc} ${def_srvc} ${stats} ${stats_sleep_time} ${verbosity_level} ${ttl} ${packet_limit} ${shared_cpu_flag}
-+sudo "$SCRIPTPATH"/onvm_mgr/"$RTE_TARGET"/onvm_mgr -l "$cpu" -n 4 --proc-type=primary -w 07:00.0 -w 09:00.0 ${virt_addr} -- -p ${ports} -n ${nf_cores} ${num_srvc} ${def_srvc} ${stats} ${stats_sleep_time} ${verbosity_level} ${ttl} ${packet_limit} ${shared_cpu_flag}
+```bash
+ALLOW_LIST="${ONVM_ALLOW_LIST:---allow 0000:08:00.0 --allow 0000:09:00.0}"
+sudo ./build/onvm/onvm_mgr/onvm_mgr -l "$cpu" -n 4 --proc-type=primary \
+  ${ALLOW_LIST} ${virt_addr} -- -p ${ports} ...
 ```
 
-> Replace `07:00.0` / `09:00.0` with the actual Mellanox PCI addresses on your FABRIC nodes.
+> Replace the PCI addresses with the actual Mellanox PCI addresses of the N3/N6 NICs on your FABRIC nodes. **Do not include the control-plane NIC** (used for N2/SCTP) — it must stay under kernel control.
+
+---
+
+### 3.3 Static ARP Entries on Remote Nodes (Required)
+
+When DPDK/ONVM controls the data-plane NICs on the CN node, the Linux kernel on that node **can no longer respond to ARP requests** on those interfaces. This means Node1 (UERAN) and Node3 (DN) cannot dynamically learn the UPF's MAC addresses.
+
+**You must add static ARP entries on Node1 and Node3** before running experiments, our setup script contain this part, but in case you setup error:
+
+```bash
+# On Node1 (UERAN): add static entry for UPF's N3 interface
+sudo arp -s <UPF_N3_IP> <UPF_N3_MAC>
+# Example: sudo arp -s 192.168.1.2 02:ff:9d:c8:0a:05
+
+# On Node3 (DN): add static entry for UPF's N6 interface
+sudo arp -s <UPF_N6_IP> <UPF_N6_MAC>
+# Example: sudo arp -s 192.168.2.1 02:dc:be:a5:82:1d
+```
+
+To find the correct MAC addresses, run `ip link show <interface>` on the CN node **before** starting ONVM.
+
+> Without static ARP, remote nodes send ARP requests that arrive at UPF-U and are silently dropped ("Not IP packet, ignore it"). Ping and all data-plane traffic will fail.
+
+---
+
+### 3.4 Add UE Subnet Route on DN Node
+
+The DN node needs a route to send reply traffic back to UE addresses (e.g., `10.60.0.0/16`) through the UPF:
+
+```bash
+# On Node3 (DN):
+sudo ip route add 10.60.0.0/16 via <UPF_N6_IP>
+# Example: sudo ip route add 10.60.0.0/16 via 192.168.2.1
+```
+
+Without this route, the DN node does not know how to reach UE IP addresses and will drop reply packets.
+
+---
+
+### 3.5 Set MTU on FABRIC Interfaces
+
+FABRIC links may use a non-standard MTU. Set all data-plane interfaces on every node to the same value (e.g., 1518) to avoid intermittent failures:
+
+```bash
+sudo ip link set <interface> mtu 1518
+```
 
 ---
 
 ## 4. Run experiments
 
-Other steps are similar to the CloudLab workflow. Please refer to:
+### Startup Order
+
+Services on the CN node must be started in this order:
+
+1. **ONVM Manager** — wait until port info is printed
+2. **UPF-U** — wait for "NF_READY" message
+3. **UPF-C** — wait for "NF_READY" message
+4. **CP NFs** (`run_cp_nfs.sh`) — wait for "All NFs started"
+5. (Optional) **Webconsole**
+
+Then on Node1 (UERAN):
+
+6. **gNB** — wait for "NG Setup procedure is successful"
+7. **UE** — wait for "PDU Session establishment successful"
+
+Other steps are similar. Please refer to:
 
 * [Running L25GC+](https://github.com/nycu-ucr/L25GC-plus/tree/main/README.md#running-l25gc)
 
@@ -212,3 +276,33 @@ Then browse:
 
   * If your service is bound to `0.0.0.0:5000`, this still works.
   * If your service is bound only to a specific CN interface IP, replace `127.0.0.1` with that interface IP.
+
+---
+
+## 6. Troubleshooting
+
+### UPF-U prints "Not IP packet, ignore it"
+
+ARP packets are arriving at DPDK because the remote node cannot resolve the UPF's MAC address.
+**Fix:** Add static ARP entries on Node1 and Node3 (see Section 3.3).
+
+### gNB cannot connect to AMF ("Connection refused" or timeout)
+
+* Check that AMF is listening: `sudo ss -an | grep 38412` on Node2. You should see `LISTEN` on the correct CP address.
+* Verify `ngapIpList` in `amfcfg.yaml` matches the CN node's control-plane interface IP.
+* If DPDK grabbed the CP NIC by mistake, make sure your `--allow` flags only include data-plane NICs and restart ONVM.
+
+### Control-plane ping (192.168.3.x) fails after starting ONVM
+
+DPDK may have taken over the control-plane NIC. This happens when `--allow` is not used, causing DPDK to probe all Mellanox NICs.
+**Fix:** Use `--allow` to restrict DPDK to the two data-plane NICs only (see Section 3.2).
+
+
+### Ping through UE tunnel (`uesimtun0`) gets no reply
+
+Check in order:
+
+1. **Static ARP** on Node1 and Node3 (Section 3.3)
+2. **UE subnet route** on Node3 (Section 3.4)
+3. **Port indices** in `upf_u.yaml` match the actual DPDK port order (verify from ONVM manager port printout)
+4. **MAC addresses** in `upf_u.yaml` (`dn_mac`, `an_mac`) match the actual neighbor interfaces
