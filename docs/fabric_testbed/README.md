@@ -147,9 +147,41 @@ Then pass them to the ONVM manager using `--allow <PCI_ADDR>` (repeat for each p
 Example:
 
 ```bash
-ALLOW_LIST="${ONVM_ALLOW_LIST:---allow 0000:08:00.0 --allow 0000:09:00.0}"
+ALLOW_LIST="${ONVM_ALLOW_LIST:-}"
+
 sudo ./build/onvm/onvm_mgr/onvm_mgr -l "$cpu" -n 4 --proc-type=primary \
   ${ALLOW_LIST} ${virt_addr} -- -p ${ports} ...
+```
+
+This makes the allow-list configurable at runtime without re-editing files.
+
+#### Runtime usage (recommended on FABRIC)
+
+1) Export the allow-list on the **CN** node (replace PCI addresses with your N3/N6 NICs):
+
+```bash
+export ONVM_ALLOW_LIST="--allow 0000:08:00.0 --allow 0000:09:00.0"
+```
+
+2) Start ONVM manager normally (with `-k 3` when you allow exactly two ports):
+
+```bash
+./scripts/run/run_onvm_mgr.sh -k 3
+```
+
+> If you forget to export `ONVM_ALLOW_LIST`, ONVM/DPDK will launch **without** `--allow` filters and may enumerate all DPDK-usable Mellanox NICs on the node (often 3 ports: 0/1/2 on FABRIC). This can break the UPF-U `pkt->port ^ 1` port-swap assumption and may also accidentally take over a control-plane NIC.
+
+Optional: set it inline (avoids forgetting the export):
+
+```bash
+ONVM_ALLOW_LIST="--allow 0000:08:00.0 --allow 0000:09:00.0" \
+  ./scripts/run/run_onvm_mgr.sh -k 3
+```
+
+To clear it later:
+
+```bash
+unset ONVM_ALLOW_LIST
 ```
 
 > Replace the PCI addresses with the actual Mellanox PCI addresses of the N3/N6 NICs on your FABRIC nodes. **Do not include the control-plane NIC** (used for N2/SCTP) — it must stay under kernel control.
