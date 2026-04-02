@@ -114,3 +114,42 @@ into:
   amfConfigs:
     - address: 128.105.144.114  # 127.0.0.1
 ```
+
+---
+
+### Add L3 Routes on the UERAN Node and DN Node
+
+On the DN node, add a route so that reply traffic to the UE subnet (or a specific UE IP such as `10.60.0.1`) is sent through the UPF-U core-side interface:
+
+```bash
+# On the DN node:
+sudo ip route add <ue_ip_or_subnet> via <upf_core_ip> dev <interface>
+
+# Example:
+sudo ip route add 10.60.0.1 via 10.10.1.1 dev ens1f1
+```
+
+- Here, `10.10.1.1` is the **UPF local IP on the core-side interface**. It should match the `upf_core_ip` configured in:
+
+  ```bash
+  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
+  ```
+
+- `interface` is the local network interface on the DN node that is connected to the same subnet as the UPF-U core-side interface. In the example above, this interface is `ens1f1`.
+
+Similarly, on the UERAN node, add a route so that traffic destined for the DN server is sent through the UPF-U access-side interface:
+
+```bash
+# On the UERAN node:
+sudo ip route add <dn_server_ip> via <upf_access_ip> dev <interface>
+
+# Example:
+sudo ip route add 10.10.1.2 via 192.168.1.2 dev ens1f0
+```
+
+- Here, `192.168.1.2` is the **UPF local IP on the access-side interface**. It should match the `upf_access_ip` configured in:
+
+  ```bash
+  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
+  ```
+- `interface` is the local network interface on the UERAN node that is connected to the same subnet as the UPF-U access-side interface. In the example above, this interface is `ens1f0`.
