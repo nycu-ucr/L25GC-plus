@@ -3,14 +3,14 @@
 ![Architecture.png](ref_architecture.png)
 
 
-### Setting L25GC-plus Parameters
-In L25GC-plus VM, we need to edit three files:
+### Setting L25GC-plus Parameters (CN node)
+On CN node, we need to edit three files:
 
 - `~/L25GC-plus/config/amfcfg.yaml`
 - `~/L25GC-plus/config/smfcfg.yaml`
 - `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/upf_u.yaml`
 
-First SSH into L25GC-plus VM, and change `~/L25GC-plus/config/amfcfg.yaml`:
+First SSH into the CN node, and change `~/L25GC-plus/config/amfcfg.yaml`:
 ```
 cd ~/L25GC-plus
 nano config/amfcfg.yaml
@@ -26,7 +26,7 @@ into:
 ```
 ...
   ngapIpList:  # the IP list of N2 interfaces on this AMF
-  - 128.105.144.114  # 127.0.0.1
+  - 128.105.144.114
 ```
 
 Next edit `~/L25GC-plus/config/smfcfg.yaml`:
@@ -34,7 +34,7 @@ Next edit `~/L25GC-plus/config/smfcfg.yaml`:
 nano config/smfcfg.yaml
 ```
 and in the entry inside `userplaneInformation / upNodes / UPF / interfaces / endpoints`, change the IP from `127.0.0.8` to `192.168.1.2`, namely from:
-```
+```yaml
 ...
   interfaces: # Interface list for this UPF
    - interfaceType: N3 # the type of the interface (N3 or N9)
@@ -42,12 +42,12 @@ and in the entry inside `userplaneInformation / upNodes / UPF / interfaces / end
        - 127.0.0.8
 ```
 into:
-```
+```yaml
 ...
   interfaces: # Interface list for this UPF
    - interfaceType: N3 # the type of the interface (N3 or N9)
      endpoints: # the IP address of this N3/N9 interface on this UPF
-       - 192.168.1.2  # 127.0.0.8
+       - 192.168.1.2
 ```
 
 Next edit `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml`:
@@ -87,15 +87,15 @@ For the example above:
 * `dn_peer_ip: 10.10.1.2` corresponds to **DN `ens1f1` IP**
 
 ### Setting UERANSIM Parameters
-In the ueransim VM, there are two files related to L25GC-plus：
+In the UERAN node, there are two files related to L25GC-plus：
 
-- `~/UERANSIM/config/free5gc-gnb.yaml`
-- `~/UERANSIM/config/free5gc-ue.yaml`
+- `~/L25GC-plus/UERANSIM/config/free5gc-gnb.yaml`
+- `~/L25GC-plus/UERANSIM/config/free5gc-ue.yaml`
 
 The second file is for UE, which we don’t have to change if the data inside is consistent with the (default) registration data we set using WebConsole previously.
 
 First SSH into ueransim, and edit the file `~/UERANSIM/config/free5gc-gnb.yaml`, and change the ngapIp IP from `127.0.0.1` to `128.105.144.107`, gtpIp IP from `127.0.0.1` to `192.168.56.102`，and also change the IP in amfConfigs into `128.105.144.114`, that is, from:
-```
+```yaml
 ...
   ngapIp: 127.0.0.1   # gNB's local IP address for N2 Interface (Usually same with local IP)
   gtpIp: 127.0.0.1    # gNB's local IP address for N3 Interface (Usually same with local IP)
@@ -105,14 +105,14 @@ First SSH into ueransim, and edit the file `~/UERANSIM/config/free5gc-gnb.yaml`,
     - address: 127.0.0.1
 ```
 into:
-```
+```yaml
 ...
-  ngapIp: 128.105.144.107  # 127.0.0.1   # gNB's local IP address for N2 Interface (Usually same with local IP)
-  gtpIp: 192.168.1.1  # 127.0.0.1    # gNB's local IP address for N3 Interface (Usually same with local IP)
+  ngapIp: 128.105.144.107 # gNB's local IP address for N2 Interface (Usually same with local IP)
+  gtpIp: 192.168.1.1      # gNB's local IP address for N3 Interface (Usually same with local IP)
 
   # List of AMF address information
   amfConfigs:
-    - address: 128.105.144.114  # 127.0.0.1
+    - address: 128.105.144.114
 ```
 
 ---

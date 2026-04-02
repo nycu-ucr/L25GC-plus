@@ -19,7 +19,8 @@ For more design details, please refer to:
 
 1. Configure `N2`, `N3`, and `UPF-U` on the CN node.
 2. Configure `UERANSIM` on the UE/AN node.
-3. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
+3. Configure the DN node.
+4. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
 
 ---
 
@@ -84,14 +85,16 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```
 
 ## Running UERANSIM
-This script assumes the `L25GC-plus/UERANSIM` folder is your working directory.
+This script assumes the `~/L25GC-plus/UERANSIM` folder is your working directory.
 
 1. **Run gNB**
     ```bash
-    ./build/nr-gnb -c config/free5gc-gnb.yaml
+    cd ~/L25GC-plus/UERANSIM
+    sudo ./build/nr-gnb -c config/free5gc-gnb.yaml
     ```
 2. **Run UE** (new terminal)
     ```bash
+    cd ~/L25GC-plus/UERANSIM
     sudo ./build/nr-ue -c config/free5gc-ue.yaml
     ```
 
