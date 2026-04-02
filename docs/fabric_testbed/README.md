@@ -5,7 +5,7 @@ This guide describes how to deploy **L25GC+ on the [NSF FABRIC testbed](https://
 1. Create a FABRIC slice using our provided artifact
 2. Log into the provisioned nodes
 3. Run setup scripts + install MLNX_OFED
-4. Apply Mellanox-specific ONVM runtime/script settings (`--allow`, portmask, static ARP, routes)
+4. Apply Mellanox-specific ONVM runtime/script settings (`--allow`, portmask, routes)
 5. Start the ONVM manager and run experiments
 
 ---
@@ -18,17 +18,13 @@ We provide a pre-defined **FABRIC Artifact** that includes the topology and node
 * Use the artifact to create a new slice in the FABRIC portal.
 * Once the slice is provisioned, SSH into the nodes from your local machine.
 
-### Topology Notes (FABRIC)
+### Reference Topology on FABRIC
 
-* We have successfully deployed L25GC+ on FABRIC.
-* Reference diagram:
   ![FABRIC Topology](./images/FABRIC.png)
-
-> We add an additional bridge named `br-CNAN-CP` to enable the N2 interface connection between the gNB and AMF.
 
 ---
 
-## 1. Install MLNX_OFED (Ubuntu 20.04 / 22.04)
+## 1. Install MLNX_OFED
 
 Install Mellanox OFED using either NVIDIA’s official documentation or the provided script.
 
@@ -39,17 +35,11 @@ cd ./L25GC-plus/scripts
 
 > The `install_ofed.sh` script supports **Ubuntu 20.04 and 22.04**.
 
-<!-- **Recommended:** reboot after OFED installation to ensure the driver stack is loaded correctly. -->
-
 ---
 
 ## 2. Run the setup script on FABRIC nodes
 
 Run `setup.sh` on each node (CN / UE / DN) to install L25GC+ and required packages.
-
-* Before running the script, you may need to adjust network settings in:
-
-  * `./L25GC-plus/scripts/set_nw_env.sh`
 
 ```bash
 cd ./L25GC-plus/scripts
@@ -156,43 +146,48 @@ sudo ./build/onvm/onvm_mgr/onvm_mgr -l "$cpu" -n 4 --proc-type=primary \
 
 ---
 
-### 3.3 Static ARP Entries on Remote Nodes (Required)
+### 3.3 Add L3 Routes on the UERAN Node and DN Node
 
-When DPDK/ONVM controls the data-plane NICs on the CN node, the Linux kernel on that node **can no longer respond to ARP requests** on those interfaces. This means Node1 (UERAN) and Node3 (DN) cannot dynamically learn the UPF's MAC addresses.
+Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
-**You must add static ARP entries on Node1 and Node3** before running experiments, our setup script contain this part, but in case you setup error:
+On the DN node, add a route so that reply traffic to the UE subnet (or a specific UE IP such as `10.60.0.1`) is sent through the UPF-U core-side interface:
 
 ```bash
-# On Node1 (UERAN): add static entry for UPF's N3 interface
-sudo arp -s <UPF_N3_IP> <UPF_N3_MAC>
-# Example: sudo arp -s 192.168.1.2 02:ff:9d:c8:0a:05
+# On the DN node:
+sudo ip route add <ue_ip_or_subnet> via <upf_core_ip> dev <interface>
 
-# On Node3 (DN): add static entry for UPF's N6 interface
-sudo arp -s <UPF_N6_IP> <UPF_N6_MAC>
-# Example: sudo arp -s 192.168.2.1 02:dc:be:a5:82:1d
+# Example:
+sudo ip route add 10.60.0.1 via 10.133.10.3 dev enp7s0
 ```
 
-To find the correct MAC addresses, run `ip link show <interface>` on the CN node **before** starting ONVM.
+- Here, `10.133.10.3` is the **UPF local IP on the core-side interface**. It should match the `upf_core_ip` configured in:
 
-> Without static ARP, remote nodes send ARP requests that arrive at UPF-U and are silently dropped ("Not IP packet, ignore it"). Ping and all data-plane traffic will fail.
+  ```bash
+  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
+  ```
+
+- `interface` is the local network interface on the DN node that is connected to the same subnet as the UPF-U core-side interface. In the example above, this interface is `enp7s0`.
+
+Similarly, on the UERAN node, add a route so that traffic destined for the DN server is sent through the UPF-U access-side interface:
+
+```bash
+# On the UERAN node:
+sudo ip route add <dn_server_ip> via <upf_access_ip> dev <interface>
+
+# Example:
+sudo ip route add 10.133.10.2 via 10.133.9.3 dev enp8s0
+```
+
+- Here, `10.133.9.3` is the **UPF local IP on the access-side interface**. It should match the `upf_access_ip` configured in:
+
+  ```bash
+  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
+  ```
+- `interface` is the local network interface on the UERAN node that is connected to the same subnet as the UPF-U access-side interface. In the example above, this interface is `enp8s0`.
 
 ---
 
-### 3.4 Add UE Subnet Route on DN Node
-
-The DN node needs a route to send reply traffic back to UE addresses (e.g., `10.60.0.0/16`) through the UPF:
-
-```bash
-# On Node3 (DN):
-sudo ip route add 10.60.0.0/16 via <UPF_N6_IP>
-# Example: sudo ip route add 10.60.0.0/16 via 192.168.2.1
-```
-
-Without this route, the DN node does not know how to reach UE IP addresses and will drop reply packets.
-
----
-
-### 3.5 Set MTU on FABRIC Interfaces
+### 3.4 Set MTU on FABRIC Interfaces
 
 FABRIC links may use a non-standard MTU. Set all data-plane interfaces on every node to the same value (e.g., 1518) to avoid intermittent failures:
 
@@ -281,11 +276,6 @@ Then browse:
 
 ## 6. Troubleshooting
 
-### UPF-U prints "Not IP packet, ignore it"
-
-ARP packets are arriving at DPDK because the remote node cannot resolve the UPF's MAC address.
-**Fix:** Add static ARP entries on Node1 and Node3 (see Section 3.3).
-
 ### gNB cannot connect to AMF ("Connection refused" or timeout)
 
 * Check that AMF is listening: `sudo ss -an | grep 38412` on Node2. You should see `LISTEN` on the correct CP address.
@@ -297,12 +287,9 @@ ARP packets are arriving at DPDK because the remote node cannot resolve the UPF'
 DPDK may have taken over the control-plane NIC. This happens when `--allow` is not used, causing DPDK to probe all Mellanox NICs.
 **Fix:** Use `--allow` to restrict DPDK to the two data-plane NICs only (see Section 3.2).
 
-
 ### Ping through UE tunnel (`uesimtun0`) gets no reply
 
 Check in order:
 
-1. **Static ARP** on Node1 and Node3 (Section 3.3)
-2. **UE subnet route** on Node3 (Section 3.4)
-3. **Port indices** in `upf_u.yaml` match the actual DPDK port order (verify from ONVM manager port printout)
-4. **MAC addresses** in `upf_u.yaml` (`dn_mac`, `an_mac`) match the actual neighbor interfaces
+1. **UE subnet route** on Node3 (Section 3.3)
+2. **Port indices** in `upf_u.yaml` match the actual DPDK port order (verify from ONVM manager port printout)
