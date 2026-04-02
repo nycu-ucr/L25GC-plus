@@ -8,7 +8,7 @@ In L25GC-plus VM, we need to edit three files:
 
 - `~/L25GC-plus/config/amfcfg.yaml`
 - `~/L25GC-plus/config/smfcfg.yaml`
-- `~/onvm/onvm-upf/5gc/upf_u/upf_u.yaml`
+- `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/upf_u.yaml`
 
 First SSH into L25GC-plus VM, and change `~/L25GC-plus/config/amfcfg.yaml`:
 ```
@@ -50,31 +50,40 @@ into:
        - 192.168.1.2  # 127.0.0.8
 ```
 
-Next edit `~/onvm/onvm-upf/5gc/upf_u/upf_u.yaml`:
+Next edit `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml`:
 
-```
-# DN MAC Address
-3c:fd:fe:b4:fd:6d
-# AN MAC Address
-3c:fd:fe:b0:ef:f4
-# UPF ID Address
-10.10.1.2
-```
-into:
-```
-# DN MAC Address
-90:e2:ba:b5:15:81
-# AN MAC Address
-90:e2:ba:b5:14:30
-# UPF ID Address
-192.168.1.2
+```yaml
+info:
+  version: 1.0.0
+  description: L25GC+ UPF-U Configuration
+
+configuration:
+  log_level: "warning" # trace, debug, info, warning, error, fatal, panic
+  dataplane:
+    upf_access_ip: "192.168.1.2"    # UPF local IP on the access-facing port
+    upf_core_ip: "192.168.1.2"      # UPF local IP on the core/SGi-facing port
+    an_peer_ip: "192.168.1.1"       # Next-hop IP of the AN/gNB peer
+    dn_peer_ip: "192.168.1.4"       # Next-hop IP of the DN/upstream router peer
+
+    ports:
+      access: 1                     # ACCESS-facing DPDK port
+      core: 0                       # CORE-facing DPDK port
 ```
 
-~~~
-90:e2:ba:b5:15:81 is  Host3 ens1f1 MAC ADDRESS
-90:e2:ba:b5:14:30 is  Host1 ens1f0 MAC ADDRESS
-192.168.1.2       is  Host2 ens1f0 MAC ADDRESS
-~~~
+Set the fields as follows:
+
+* `upf_access_ip`: the UPF local IP on the access-side interface
+* `upf_core_ip`: the UPF local IP on the core-side interface
+* `an_peer_ip`: the IP of the AN/gNB peer connected to the UPF access side
+* `dn_peer_ip`: the IP of the DN/upstream peer connected to the UPF core side
+* `ports.access`: the DPDK port connected to the access side
+* `ports.core`: the DPDK port connected to the core side
+
+For the example above:
+
+* `an_peer_ip: 192.168.1.1` corresponds to **UE/AN `ens1f0` IP**
+* `upf_access_ip: 192.168.1.2` corresponds to the **UPF access-side local IP on Host2**
+* `dn_peer_ip: 10.10.1.1` corresponds to **DN `ens1f1` IP**
 
 ### Setting UERANSIM Parameters
 In the ueransim VM, there are two files related to L25GC-plus：
