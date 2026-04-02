@@ -19,8 +19,7 @@ For more design details, please refer to:
 
 1. Configure `N2`, `N3`, and `UPF-U` on the CN node.
 2. Configure `UERANSIM` on the UE/AN node.
-3. Update IP routes and ARP settings in `scripts/set_nw_env.sh` for both UE/AN and DN nodes.
-4. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
+3. Refer to our [setup guide](./docs/config/README.md) and instructional [video]() for step-by-step instructions.
 
 ---
 

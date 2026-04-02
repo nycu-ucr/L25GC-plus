@@ -61,13 +61,13 @@ configuration:
   log_level: "warning" # trace, debug, info, warning, error, fatal, panic
   dataplane:
     upf_access_ip: "192.168.1.2"    # UPF local IP on the access-facing port
-    upf_core_ip: "192.168.1.2"      # UPF local IP on the core/SGi-facing port
+    upf_core_ip: "10.10.1.1"        # UPF local IP on the core/SGi-facing port
     an_peer_ip: "192.168.1.1"       # Next-hop IP of the AN/gNB peer
-    dn_peer_ip: "192.168.1.4"       # Next-hop IP of the DN/upstream router peer
+    dn_peer_ip: "10.10.1.2"         # Next-hop IP of the DN/upstream router peer
 
     ports:
-      access: 1                     # ACCESS-facing DPDK port
-      core: 0                       # CORE-facing DPDK port
+      access: 0                     # ACCESS-facing DPDK port
+      core: 1                       # CORE-facing DPDK port
 ```
 
 Set the fields as follows:
@@ -82,8 +82,9 @@ Set the fields as follows:
 For the example above:
 
 * `an_peer_ip: 192.168.1.1` corresponds to **UE/AN `ens1f0` IP**
-* `upf_access_ip: 192.168.1.2` corresponds to the **UPF access-side local IP on Host2**
-* `dn_peer_ip: 10.10.1.1` corresponds to **DN `ens1f1` IP**
+* `upf_access_ip: 192.168.1.2` corresponds to the **UPF-U access-side local IP on CN**
+* `upf_core_ip: 10.10.1.1` corresponds to the **UPF-U core-side local IP on CN**
+* `dn_peer_ip: 10.10.1.2` corresponds to **DN `ens1f1` IP**
 
 ### Setting UERANSIM Parameters
 In the ueransim VM, there are two files related to L25GC-plus：
