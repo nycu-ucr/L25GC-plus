@@ -46,3 +46,6 @@
 [submodule "UERANSIM"]
 	path = UERANSIM
 	url = https://github.com/aligungr/UERANSIM.git
+[submodule "openairinterface5g"]
+	path = openairinterface5g
+	url = https://github.com/openairinterface/openairinterface5g.git
