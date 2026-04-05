@@ -28,7 +28,7 @@ We provide a pre-setuped **FABRIC Cluster** that includes the topology and node 
 
 ## 1. Installation
 
-Please refer to [this](https://github.com/nycu-ucr/L25GC-plus/tree/main/docs/fabric_testbed#1-install-mlnx_ofed) document for installation.
+Please refer to [this](https://github.com/nycu-ucr/L25GC-plus/tree/main/docs/fabric_testbed#1-install-mlnx_ofed) document section 1 to 3 for installation.
 
 ### Notes
 
@@ -51,7 +51,7 @@ sudo ip a add <IP/24> dev <interface>
 sudo ip l set <interface> up
 ```
 
-## 3. Configuration
+## 2. Configuration
 
 ### CN node
 First edit `~/L25GC-plus/config/amfcfg.yaml`
@@ -145,7 +145,7 @@ uicc0 = {
 
 ---
 
-## 4. Run experiments
+## 3. Run experiments
 
 ### Startup Order
 
