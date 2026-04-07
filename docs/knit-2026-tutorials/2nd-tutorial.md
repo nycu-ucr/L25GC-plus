@@ -230,6 +230,7 @@ with:
   ngapIp: {N2_IP_ON_UERAN_NODE}   # gNB's N2 Interface IP address
   gtpIp:  {N3_IP_ON_UERAN_NODE}   # gNB's N3 Interface IP address
 
+
   amfConfigs:
     - address: {N2_IP_ON_CN}      # AMF's N2 interface IP address
 ```
