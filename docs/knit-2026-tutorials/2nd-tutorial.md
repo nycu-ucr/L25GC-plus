@@ -166,6 +166,50 @@ Make sure that all of these values match the actual interface IP addresses in yo
 
 > **Note:** In the current implementation, `an_peer_n3_ip` and `dn_peer_n6_ip` must be set manually. We plan to improve this in a future revision so that these peer IP addresses no longer need to be configured explicitly.
 
+### Step-6: Provision UE Subscription Data in the CN's Database
+> Next, we need to use the WebConsole (adapted from free5GC) to provision UE subscription data in the CN's database. It provides the necessary subscriber information that enables L25GC+ to authenticate the UE and establish services correctly during PDU Session Establishment.
+
+If your web console service is running on the FABRIC CN node (for example on port **5000**), the recommended way to access it from your laptop is to use **SSH local port forwarding**.
+
+#### Customize for your FABRIC SSH command
+The SSH command below includes **example values**. On your setup, the following fields will likely be different:
+
+* **SSH private key path** (example: `.ssh/fabric_keys/slice_key`)
+* **FABRIC SSH config file path** (example: `.ssh/fabric_ssh_config`)
+* **CN node address** (IPv6) and sometimes the **username**
+
+#### Option A: Forward `localhost:5000` → CN `localhost:5000`
+Open a new terminal on your **laptop** and run the following command  (replace the values above with your own):
+
+```bash
+ssh -N \
+  -i .ssh/fabric_keys/slice_key \
+  -F .ssh/fabric_ssh_config \
+  -L 5000:127.0.0.1:5000 \
+  ubuntu@<CN_NODE_ADDRESS>
+```
+
+Then open in your laptop browser:
+
+* `http://localhost:5000`
+
+#### Option B: Use a different local port (recommended if 5000 is occupied)
+
+If port 5000 on your laptop is already in use, map a different local port (e.g., **15000 → 5000**):
+
+```bash
+ssh -N \
+  -i .ssh/fabric_keys/slice_key \
+  -F .ssh/fabric_ssh_config \
+  -L 15000:127.0.0.1:5000 \
+  ubuntu@<CN_NODE_ADDRESS>
+```
+
+Then browse:
+
+* `http://localhost:15000`
+
+---
 
 ## 2. Log into the UE/RAN node and Setup Environment
 Open **a new terminal** and SSH into your assigned UE/RAN node.
@@ -229,7 +273,6 @@ with:
 ...
   ngapIp: {N2_IP_ON_UERAN_NODE}   # gNB's N2 Interface IP address
   gtpIp:  {N3_IP_ON_UERAN_NODE}   # gNB's N3 Interface IP address
-
 
   amfConfigs:
     - address: {N2_IP_ON_CN}      # AMF's N2 interface IP address
@@ -362,84 +405,15 @@ sudo ip route add 10.60.0.1 via 10.133.10.3 dev enp7s0
 
 - `N6_INTERFACE_on_DN` is the local network interface on the DN node that is connected to the **Subnet-3** as the UPF-U's N6 interface. In the example above, this interface is `enp7s0`.
 
-
-
-
-
-
-
-
-
-
-
-
-
-## 1. Installation
-Please refer to [this](https://github.com/nycu-ucr/L25GC-plus/tree/main/docs/fabric_testbed#1-install-mlnx_ofed) document section 1 to 3 for installation.
-
-### Notes
-
-* If you wish to perform handover experiment below, please run `./setup.sh ue oai` when installing ue.
-
-* Make sure three nodes has interface ip like this:
-
-    | Interface / Node | Node 1 (UE/RAN) | Node 2 (CN) | Node 3 (DN) |
-    | :--- | :--- | :--- | :--- |
-    | enp7s0 | 192.168.1.1 | 192.168.1.2 | 192.168.2.2 |
-    | enp8s0 | 192.168.3.1 | 192.168.2.1 | x |
-    | enp9s0 | x | 192.168.3.2 | x |
 ---
 
-Use these commands to setup interface ip:
-```bash
-# add an address
-sudo ip a add <IP/24> dev <interface>
-# bring up an interface
-sudo ip l set <interface> up
-```
+## 3. Testing L25GC+ with UERANsim (PDU Session Establishment, ping, iperf3)
 
-## 2. Configuration
-
-### CN node
-First edit `~/L25GC-plus/config/amfcfg.yaml`
-```bash
-cd ~/L25GC-plus
-nano config/amfcfg.yaml
-```
-Replace ngapIpList IP from `127.0.0.1` to AMF's N2 interface, ex:
-```bash
-...
-  ngapIpList:  # the IP list of N2 interfaces on this AMF
-    - 192.168.3.2
-```
-Next edit `~/L25GC-plus/config/smfcfg.yaml`:
-```bash
-nano config/smfcfg.yaml
-```
-and in the entry inside `userplaneInformation / upNodes / UPF / interfaces / endpoints`, change the IP from `127.0.0.8` to UPF's N3 interface, ex:
-```bash
-...
-  interfaces: # Interface list for this UPF
-   - interfaceType: N3 # the type of the interface (N3 or N9)
-     endpoints: # the IP address of this N3/N9 interface on this UPF
-       - 192.168.1.2
-```
-Finally, edit `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml`:
-```bash
-nano NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
-```
-in the entry inside `configuration / dataplane`, change `upf_access_ip`, and `upf_core_ip`, ex:
-```bash
-...
-  dataplane:
-    upf_access_ip: "192.168.1.2"    # UPF local IP on the access-facing port
-    upf_core_ip: "192.168.1.2"      # UPF local IP on the core/SGi-facing port
-``` 
-
+> In this experiment, we will bring up all NFs for L25GC+ on the CN node. Then we will bring up the UERANsim's gNB and UE on the UERAN node. We will next test the connectivity between the UERAN node and DN node via ping. We will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
 
 ---
 
-## 3. Run experiments
+## 4. Testing L25GC+ with OAI UE/RAN (PDU Session Establishment + Handover)
 
 ### Startup Order
 
