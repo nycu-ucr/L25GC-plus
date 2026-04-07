@@ -2,7 +2,7 @@
 
 # ==============================================================================
 # UE/RAN Node Setup Script
-# Default mode installs UERANSIM; use --oai to install OAI UE/RAN
+# Installs dependencies and builds UERANsim and OAI UE/RAN for 5G User Equipment simulation
 # ==============================================================================
 
 set -euo pipefail
@@ -12,20 +12,6 @@ WORK_DIR="$HOME"
 REPO_DIR="$WORK_DIR/L25GC-plus"
 CMAKE_VERSION="3.30.1"
 CMAKE_SCRIPT="cmake-${CMAKE_VERSION}-linux-x86_64.sh"
-MODE="ueransim"
-
-if [ "${1:-}" = "--oai" ]; then
-	MODE="oai"
-elif [ "${1:-}" = "--ueransim" ] || [ -z "${1:-}" ]; then
-	MODE="ueransim"
-elif [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
-	echo "Usage: $0 [--ueransim|--oai]"
-	exit 0
-else
-	echo "[ERROR] Unknown option: ${1}"
-	echo "Usage: $0 [--ueransim|--oai]"
-	exit 1
-fi
 
 # ----[ System Update and Package Installation ]-------------------------------
 echo "[INFO] Updating system packages..."
@@ -87,8 +73,8 @@ setup_oai() {
 	echo "[INFO] OAI RAN/UE setup complete."
 }
 
-if [ "$MODE" = "oai" ]; then
-	setup_oai
-else
-	setup_ueransim
-fi
+# ----[ Install OAI UE/RAN ]------------------------------------
+setup_oai
+
+# ----[ Install UERANsim ]------------------------------------
+setup_ueransim
