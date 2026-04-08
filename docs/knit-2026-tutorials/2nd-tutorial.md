@@ -64,16 +64,22 @@ Open **a new terminal** and SSH into your assigned Core Network node.
 
 After you log in, run these commands in the terminal.
 
+### Clone L25GC+ Repository
+```bash
+cd ~/
+git clone https://github.com/nycu-ucr/L25GC-plus.git
+```
+
 ### Step-1: Install MLNX_OFED on the Core Network node
 ```bash
-cd ./L25GC-plus/scripts
+cd ~/L25GC-plus/scripts
 ./install_ofed.sh
 ```
 
 ### Step-2: Run the setup script to install L25GC+ on the Core Network node
 ```bash
-cd ./L25GC-plus/scripts
-./setup.sh cn
+cd ~/L25GC-plus/
+./scripts/setup.sh cn
 ```
 
 ### Step-3: Configure AMF
@@ -216,10 +222,16 @@ Open **a new terminal** and SSH into your assigned UE/RAN node.
 
 After you log in, run these commands in the terminal.
 
+### Clone L25GC+ Repository
+```bash
+cd ~/
+git clone https://github.com/nycu-ucr/L25GC-plus.git
+```
+
 ### Step-1: Run the setup script to install UERANsim and OAI UE/RAN
 ```bash
-cd ./L25GC-plus/scripts
-./setup.sh ue
+cd ~/L25GC-plus/
+./scripts/setup.sh ue
 ```
 
 ### Step-2: Add the L3 Route to DN server
@@ -378,10 +390,16 @@ Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
 
+### Clone L25GC+ Repository
+```bash
+cd ~/
+git clone https://github.com/nycu-ucr/L25GC-plus.git
+```
+
 ### Step-1: Run the setup script to install iperf3
 ```bash
-cd ./L25GC-plus/scripts
-./setup.sh dn
+cd ~/L25GC-plus/
+./scripts/setup.sh dn
 ```
 
 ### Step-2: Add the L3 Route to UE
