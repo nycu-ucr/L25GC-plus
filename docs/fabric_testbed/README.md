@@ -5,7 +5,7 @@ This guide describes how to deploy **L25GC+ on the [NSF FABRIC testbed](https://
 1. Create a FABRIC slice using our provided artifact
 2. Log into the provisioned nodes
 3. Run setup scripts + install MLNX_OFED
-4. Apply Mellanox-specific ONVM runtime/script settings (`--allow`, portmask, routes)
+4. Apply Mellanox-specific ONVM runtime/script settings (`--allow`, routes)
 5. Start the ONVM manager and run experiments
 
 ---
@@ -50,79 +50,11 @@ cd ./L25GC-plus/scripts
 
 ## 3. Mellanox-specific ONVM runtime/script changes
 
-On Mellanox NICs, you typically do **not** bind the NIC to a DPDK driver in the same way as some other NICs/environments, and you often need to **whitelist Mellanox PCI devices** when launching ONVM.
+> On Mellanox NICs, you typically do **not** bind the NIC to a DPDK driver in the same way as some other NICs/environments, and you often need to **whitelist Mellanox PCI devices** when launching ONVM.
 
-### 3.1 Configure `PORTMASK` for `onvm_mgr` on FABRIC CN nodes
+### 3.1 Whitelist Mellanox NICs (`--allow`) in ONVM manager launch
 
-On FABRIC, a CN node may expose **three NICs that are DPDK-usable**. For L25GC+ we typically use **two NICs for the user plane**. You must confirm which two NICs correspond to the user-plane links, and then configure the ONVM manager **port mask** accordingly.
-
-#### Step 1: Identify DPDK-usable NICs and their ordering (index)
-
-The **port index** used by ONVM/DPDK follows the device enumeration order. In practice, you can determine the ordering by:
-
-* `ip a` output order (interfaces listed top-to-bottom), and/or
-* `dpdk-devbind.py --status` (recommended when available)
-
-Example commands:
-
-```bash
-ip a
-# and/or
-dpdk-devbind.py --status
-```
-
-Record the three candidate NICs and their indexes (0, 1, 2) according to the enumeration order.
-
-#### Step 2: Decide which two NICs are used for the user plane
-
-Based on your FABRIC topology (links connected to UP traffic), select **two** NICs among the three candidates.
-For example, suppose the CN node has DPDK-usable NICs with indexes:
-
-* NIC 0: `ensX` (not used for user plane)
-* NIC 1: `ensY` (**user plane**)
-* NIC 2: `ensZ` (**user plane**)
-
-Then the user-plane NIC indexes are **1 and 2**.
-
-#### Step 3: Build the portmask in binary (right-to-left), then convert to decimal
-
-Construct a **binary portmask** where each bit indicates whether the corresponding NIC index is enabled:
-
-* Bit for NIC index 0, then index 1, then index 2, … (from right to left as an index list)
-* Use `1` for enabled NICs, `0` otherwise
-
-Using the example above (enable NIC 1 and NIC 2, disable NIC 0):
-
-* NIC 2 / NIC 1 / NIC 0  → `1 1 0`
-* Binary portmask: `110`
-* Decimal value: `6`
-
-Another example:
-
-* Enable NIC 0 and NIC 2: `101` (binary) = `5` (decimal)
-
-#### Step 4: Pass the decimal portmask to ONVM manager via `-k`
-
-Once you have the decimal portmask value, pass it to the ONVM manager startup script via `-k`.
-
-> **If you use `--allow` (see Section 3.2):** DPDK only sees two ports (port 0 and port 1), so the correct portmask is **`-k 3`** (binary `11`). You can skip the manual calculation above.
-
-For example (portmask decimal = 3):
-
-```bash
-# Example: add -k 3 to the onvm_mgr launch args
-./scripts/run/run_onvm_mgr.sh -k 3
-```
-
-> Where to set it: depending on your workflow, `-k` may be part of `onvm/go.sh`, `run_manager.sh`, or another wrapper script that launches `onvm_mgr`. Update the script that actually invokes `onvm_mgr` so the correct `-k <PORTMASK_DECIMAL>` is always used on the CN node.
-
----
-
-### 3.2 Whitelist Mellanox NICs (`--allow`) in ONVM manager launch
-
-> **This step is optional.** The UPF-U forwarding code uses `pkt->port ^ 1` (XOR with 1) to swap packets between the access and core ports. This only works correctly when DPDK sees exactly **two** ports numbered 0 and 1. Without `--allow`, DPDK probes all three Mellanox NICs (ports 0, 1, 2), and the XOR logic sends packets to wrong ports.
-
-First, find the PCI addresses of your **two data-plane NICs** (N3 and N6):
+First, find the PCI addresses of your **two user-plane NIC ports** (N3 and N6):
 
 ```bash
 lspci | grep -i mell
@@ -130,23 +62,15 @@ lspci | grep -i mell
 dpdk-devbind.py --status
 ```
 
-Then pass them to the ONVM manager using `--allow <PCI_ADDR>` (repeat for each port), by editing the ONVM manager launch line in:
+Then pass them to the ONVM manager using `-a`:
 
-* `NFs/onvm-upf/scripts/start.sh`
-
-Example:
-
-```bash
-ALLOW_LIST="${ONVM_ALLOW_LIST:---allow 0000:08:00.0 --allow 0000:09:00.0}"
-sudo ./build/onvm/onvm_mgr/onvm_mgr -l "$cpu" -n 4 --proc-type=primary \
-  ${ALLOW_LIST} ${virt_addr} -- -p ${ports} ...
-```
+* `./scripts/run/run_onvm_mgr.sh -a "0000:08:00.0 0000:09:00.0"`
 
 > Replace the PCI addresses with the actual Mellanox PCI addresses of the N3/N6 NICs on your FABRIC nodes. **Do not include the control-plane NIC** (used for N2/SCTP) — it must stay under kernel control.
 
 ---
 
-### 3.3 Add L3 Routes on the UERAN Node and DN Node
+### 3.2 Add L3 Routes on the UERAN Node and DN Node
 
 Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
