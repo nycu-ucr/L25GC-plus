@@ -35,14 +35,12 @@ You will be assigned a specific node.  Please do not use any servers not assigne
 We have also released an artifact for creating clusters on Fabric: **[L25GC+ FABRIC Artifact](https://artifacts.fabric-testbed.net/artifacts/078e8c8d-eb8d-4279-b711-85fb217a7db7)**
 
 ### Topology Setup
-The experimental testbed consists of a UE/RAN node, a Core Network node, and a Data Network (DN) node, connected through three separate subnets. Subnet-1 is used for the N2 interface between the UE/RAN and the control-plane NFs in the 5G core. Subnet-2 is used for the N3 interface between the UE/RAN and the UPF-U. Subnet-3 is used for the N6 interface between the UPF-U and the DN.
+The experimental testbed consists of a UE/RAN node, a Core Network (CN) node, and a Data Network (DN) node, connected through three separate subnets. `subnet-1` is used for the N2 interface between the UE/RAN and the control-plane NFs in the 5G core. `subnet-2` is used for the N3 interface between the UE/RAN and the UPF-U. `subnet-3` is used for the N6 interface between the UPF-U and the DN.
 
 ![FABRIC Topology](./tutorial-topo.png)
 
 ### Example FABRIC Network and Interface Configuration
 The screenshot below shows an example network and interface configuration after creating a cluster on the FABRIC testbed. 
-
-In this example, `net1` corresponds to **Subnet-1**, which connects the UE/RAN and the N2 interface of the core network control plane. `net2` corresponds to **Subnet-2**, which connects the UE/RAN and the N3 interface in the core network. `net3` corresponds to **Subnet-3**, which connects the N6 interface in the core network and the DN.
 
 Users should pay close attention to four pieces of information for each interface: 
 - the node that the interface belongs to (**Node** column)
@@ -90,7 +88,11 @@ The AMF configuration file is located at:
 ~/L25GC-plus/config/amfcfg.yaml
 ```
 
-Open the file and find the `ngapIpList` field. By default, it is set to `127.0.0.1`, which must be replaced with the actual **N2 IP address** of the Core Network node. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), this is the IP address assigned to `enp9s0` (i.e., `net1` interface on the node2), which is `10.133.9.3`. 
+Open the file and find the `ngapIpList` field. By default, it is set to `127.0.0.1`, which must be replaced with the actual **N2 IP address** of the Core Network node.
+
+> You can find this IP by checking the FABRIC configuration output table: in the **Interfaces** section, look for the row whose **Name** matches the CN node’s N2 interface (`cn_node-n2-p1`), and then copy the value from the **IP Address** column. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), the **N2 IP address** of the Core Network node is `10.147.130.2`.
+
+![AMF Configuration](./amf-config.png)
 
 Change:
 
@@ -103,7 +105,7 @@ to:
 
 ```yaml
 ngapIpList:  # the IP list of N2 interfaces on this AMF
-- {N2_IP_ON_CN}
+- {IP of cn_node-n2-p1 in your FABRIC cluster}
 ### Replace it with the actual N2 IP address of your own Core Network node! ###
 ```
 
@@ -118,7 +120,11 @@ The SMF configuration file is located at:
 ~/L25GC-plus/config/smfcfg.yaml
 ```
 
-Open the file and find the `endpoints` field. By default, it is set to `127.0.0.8`, which must be replaced with the actual **N3 IP address** of the Core Network node. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), this is the IP address assigned to `enp7s0` (i.e., `net2` interface on the node2), which is `10.133.8.3`. 
+Open the file and find the `endpoints` field. By default, it is set to `127.0.0.8`, which must be replaced with the actual **N3 IP address** of the Core Network node.
+
+> You can find this IP by checking the FABRIC configuration output table: in the **Interfaces** section, look for the row whose **Name** matches the CN node's N3 interface (`cn_node-n3-p1`), and then copy the value from the **IP Address** column. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), the **N3 IP address** of the Core Network node is `10.147.131.3`.
+
+![SMF Configuration](./smf-config.png)
 
 Change:
 
@@ -137,7 +143,7 @@ to:
   interfaces: # Interface list of the UPF-U
    - interfaceType: N3 # the type of the interface (N3 or N9)
      endpoints: # the IP address of this N3 interface on this UPF
-       - {N3_IP_ON_CN}
+       - {IP of cn_node-n3-p1 in your FABRIC cluster}
 ```
 
 ### Step-5: Configure UPF-U
@@ -147,6 +153,17 @@ The UPF-U configuration file is located at:
 ```bash
 ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
 ```
+
+> **N3/N6 IP addresses on CN node:** You can find the corresponding **N3** and **N6** IP addresses by checking the FABRIC configuration output table: in the **Interfaces** section, look for the row whose **Name** matches the CN node's N3 interface (`cn_node-n3-p1`) and N6 interface (`cn_node-n6-p1`), and then copy the value from the **IP Address** column. 
+
+In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), the **N3 IP address** of the Core Network node is `10.147.131.3` and the **N6 IP address** of the Core Network node is `10.147.132.3`.
+![UPF-U Configuration](./upf-u-config.png)
+
+
+> **N3/N6 IP addresses on UERAN/DN node:** You can find the corresponding **N3** and **N6** IP addresses by checking the FABRIC configuration output table: in the **Interfaces** section, look for the row whose **Name** matches the UERAN node's N3 interface (`ueran_node-n3-p1`) and  DN node's N6 interface (`dn_node-n6-p1`), and then copy the value from the **IP Address** column. 
+
+In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), the **N3 IP address** of the UERAN node is `10.147.131.2` and the **N6 IP address** of the DN node is `10.147.132.2`.
+![UERAN/DN Configuration](./ueran-dn-config.png)
 
 The configuration file should look like this (based on the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration)):
 
@@ -158,10 +175,10 @@ info:
 configuration:
   log_level: "warning" # trace, debug, info, warning, error, fatal, panic
   dataplane:
-    upf_n3_ip: "{N3_IP_ON_CN}"    # N3 interface IP address on the Core Network node
-    upf_n6_ip: "{N6_IP_ON_CN}"   # N6 interface IP address on the Core Network node
-    an_peer_n3_ip: "{N3_IP_ON_UERAN_NODE}"  # N3 interface IP address on the UE/RAN node
-    dn_peer_n6_ip: "{N6_IP_ON_DN}"          # N6 interface IP address on the DN node
+    upf_n3_ip: "{IP of cn_node-n3-p1}"         # N3 interface IP address on the Core Network node
+    upf_n6_ip: "{IP of cn_node-n6-p1}"         # N6 interface IP address on the Core Network node
+    an_peer_n3_ip: "{IP of ueran_node-n3-p1}"  # N3 interface IP address on the UE/RAN node
+    dn_peer_n6_ip: "{IP of dn_node-n6-p1}".    # N6 interface IP address on the DN node
 
     ports:
       n3_port: 0                     # NIC port used for N3 interface
@@ -238,22 +255,30 @@ cd ~/L25GC-plus/
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the UERAN node, add a route so that traffic destined for the DN server is sent through the UPF-U's N3 interface:
-
 ```bash
 # On the UERAN node:
-sudo ip route add <DN_SERVER_IP> via <N3_IP_on_UPF_U> dev <N3_INTERFACE_on_UERAN>
-
-# Example:
-sudo ip route add 10.133.10.2 via 10.133.9.3 dev enp8s0
+sudo ip route add <IP of dn_node-n6-p1> via <IP of cn_node-n3-p1> dev <Device of ueran_node-n3-p1>
 ```
 
-- Here, `10.133.9.3` is the **UPF-U N3 IP**. It should match the `upf_n3_ip` configured in:
+You can find these values directly from the FABRIC **Interfaces** table by matching the **Name** column:
 
-  ```bash
-  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
-  ```
-- `N3_INTERFACE_on_UERAN` is the local network interface on the UERAN node that is connected to the **Subnet-2** as the UPF-U's N3 interface. In the example above, this interface is `enp8s0`.
+* Find the row named `dn_node-n6-p1`, and use its **IP Address** as the destination IP.
+* Find the row named `cn_node-n3-p1`, and use its **IP Address** as the next-hop (`via`) IP.
+* Find the row named `ueran_node-n3-p1`, and use its **Device** as the outgoing interface (`dev`).
 
+![Add L3 Route to DN server](./add-dn-route.png)
+
+In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
+
+* `dn_node-n6-p1` → `IP Address = 10.147.132.2`
+* `cn_node-n3-p1` → `IP Address = 10.147.131.3`
+* `ueran_node-n3-p1` → `Device = enp8s0`
+
+So the route becomes:
+
+```bash
+sudo ip route add 10.147.132.2 via 10.147.131.3 dev enp8s0
+```
 
 ### Step-3: Configure UERANsim (PDU Establishment only)
 > This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your FABRIC cluster.
@@ -263,12 +288,7 @@ The UERANsim gNB configuration file is located at:
 ~/L25GC-plus/UERANSIM/config/free5gc-gnb.yaml
 ```
 
-In this file:
-* `ngapIp` should be set to the gNB's **N2 interface IP address**. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), this is the IP address assigned to `enp7s0` (i.e., `net1` interface on the **node1**), which is `10.133.9.2`. 
-* `gtpIp` should be set to the gNB's **N3 interface IP address**. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), this is the IP address assigned to `enp8s0` (i.e., `net2` interface on the **node1**), which is `10.133.8.2`.
-* `amfConfigs.address` should be set to the **AMF's N2 interface IP address**. In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration), this is the IP address assigned to `enp9s0` (i.e., `net1` interface on the **node2**), which is `10.133.9.3`.
-
-For example, replace:
+Replace:
 
 ```yaml
 ...
@@ -283,14 +303,26 @@ with:
 
 ```yaml
 ...
-  ngapIp: {N2_IP_ON_UERAN_NODE}   # gNB's N2 Interface IP address
-  gtpIp:  {N3_IP_ON_UERAN_NODE}   # gNB's N3 Interface IP address
+  ngapIp: {IP of ueran_node-n2-p1}   # gNB's N2 Interface IP address
+  gtpIp:  {IP of ueran_node-n3-p1}   # gNB's N3 Interface IP address
 
   amfConfigs:
-    - address: {N2_IP_ON_CN}      # AMF's N2 interface IP address
+    - address: {IP of cn_node-n2-p1}      # AMF's N2 interface IP address
 ```
 
-Make sure these values match the actual interface IP addresses in your own FABRIC cluster.
+Make sure these values match the actual interface IP addresses in your own FABRIC cluster. You can find them directly from the FABRIC **Interfaces** table by matching the **Name** column:
+
+* `ngapIp` should be set to the **IP Address** of `ueran_node-n2-p1`, which is the gNB's **N2 interface IP**.
+* `gtpIp` should be set to the **IP Address** of `ueran_node-n3-p1`, which is the gNB's **N3 interface IP**.
+* `amfConfigs.address` should be set to the **IP Address** of `cn_node-n2-p1`, which is the AMF's **N2 interface IP**.
+
+In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
+
+* `ueran_node-n2-p1` → `IP Address = 10.147.130.3`, so `ngapIp: 10.147.130.3`
+* `ueran_node-n3-p1` → `IP Address = 10.147.131.2`, so `gtpIp: 10.147.131.2`
+* `cn_node-n2-p1` → `IP Address = 10.147.130.2`, so `amfConfigs.address: 10.147.130.2`
+
+![UERANsim Configuration](./ueransim-config.png)
 
 ### Step-4: Configure OAI UE/RAN simulator (PDU Establishment + Handover)
 > This step updates the OpenAirInterface configuration files so that the gNBs, UE, and neighboring cell settings match the current testbed environment. In particular, you will configure the PLMN and slice information, set the correct N2 and N3 IP addresses, and prepare a second gNB for the N2 handover experiment.
@@ -312,53 +344,51 @@ vim ~/L25GC-plus/openairinterface5g/targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.
 In this file, update the following three sections.
 
 ##### (a) Update `plmn_list` in the `gNBs` entry
-<!-- We will edit three parts here, start with the entry inside `gNBs`, set `plmn_list` as follows. -->
 ```bash
     plmn_list = ({ mcc = 208; mnc = 93; mnc_length = 2; snssaiList = ({ sst = 0x01; sd = 0x010203; }) });
 ```
 
-##### (b) Set `amf_ip_address` to the AMF's N2 interface IP address
-<!-- then at around line 159, set `amf_ip_address` to AMF's N2 interface, ex: -->
+##### (b) Set `amf_ip_address` to the AMF's N2 interface IP address (IP of `cn_node-n2-p1`)
 ```bash
     ////////// AMF parameters:
-    amf_ip_address = ({ ipv4 = "192.168.3.2"; });
+    amf_ip_address = ({ ipv4 = "IP of cn_node-n2-p1"; });
 ```
 
 ##### (c) Set the gNB's N2 and N3 interface IP addresses in `NETWORK_INTERFACES`
-<!-- lastly, edit `GNB_IPV4_ADDRESS_FOR_NG_AMF` and `GNB_IPV4_ADDRESS_FOR_NGU` inside entry `NETWORK_INTERFACES` to gNB's N2 interface and gNB's N3 interface, ex: -->
 ```bash
     NETWORK_INTERFACES :
     {
-        GNB_IPV4_ADDRESS_FOR_NG_AMF              = "192.168.3.1/24";
-        GNB_IPV4_ADDRESS_FOR_NGU                 = "192.168.1.1/24";
+        GNB_IPV4_ADDRESS_FOR_NG_AMF              = "IP of ueran_node-n2-p1";
+        GNB_IPV4_ADDRESS_FOR_NGU                 = "IP of ueran_node-n3-p1";
         GNB_PORT_FOR_S1U                         = 2152; # Spec 2152
     };
 ```
-`GNB_IPV4_ADDRESS_FOR_NG_AMF` should be the **gNB's N2 address**, and `GNB_IPV4_ADDRESS_FOR_NGU` should be the **gNB's N3 address**.
+`GNB_IPV4_ADDRESS_FOR_NG_AMF` should be the **gNB's N2 address** (`ueran_node-n2-p1`), and `GNB_IPV4_ADDRESS_FOR_NGU` should be the **gNB's N3 address** (`ueran_node-n3-p1`).
+
+![OAI UERAN Configuration](./oai-ueran-config.png)
 
 #### 2. Add IP addresses for the second gNB
 Since the experiment performs an N2 handover, a **second gNB** is required. 
 Assign one additional N2 IP address and one additional N3 IP address for the second gNB. For example:
 ```bash
 # N2 interface
-sudo ip a add 192.168.3.3/24 dev enp8s0
+sudo ip a add <Select an unused IP in the Subnet-1> dev <Device of ueran_node-n2-p1>
 
 # N3 interface
-sudo ip a add 192.168.1.3/24 dev enp7s0
+sudo ip a add <Select an unused IP in the Subnet-2> dev <Device of ueran_node-n3-p1>
 ```
 
-#### 3. Edit the second gNB configuration
+![OAI 2nd gNB Configuration](./oai-2nd-gnb-config.png)
+
 Next, edit `~/L25GC-plus/openairinterface5g/targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci1.rfsim.conf` using the same steps as above.
-<!-- After setting up second ip addresses, please follow the above edit gNB config steps and modify `~/L25GC-plus/openairinterface5g/targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci1.rfsim.conf`.  -->
 
 Make sure that:
-- `amf_ip_address` is still set to the **AMF's N2 interface IP address**
-- `GNB_IPV4_ADDRESS_FOR_NG_AMF` is set to the **second gNB's N2 address**
-- `GNB_IPV4_ADDRESS_FOR_NGU` is set to the **second gNB's N3 address**
+- `amf_ip_address` is still set to the **AMF's N2 interface IP address** (`cn_node-n2-p1`)
+- `GNB_IPV4_ADDRESS_FOR_NG_AMF` is set to the **second gNB's** N2 address
+- `GNB_IPV4_ADDRESS_FOR_NGU` is set to the **second gNB's** N3 address
 
-<!-- Please remember to set `GNB_IPV4_ADDRESS_FOR_NG_AMF` and `GNB_IPV4_ADDRESS_FOR_NGU` to new created addresses. -->
 
-#### 4. Edit the neighbor cell configuration
+#### 3. Edit the neighbor cell configuration
 Now edit `~/L25GC-plus/openairinterface5g/targets/PROJECTS/GENERIC-NR-5GC/CONF/neighbour-config-rfsim.conf`
 ```bash
 vim targets/PROJECTS/GENERIC-NR-5GC/CONF/neighbour-config-rfsim.conf
@@ -369,7 +399,7 @@ Inside `neighbour_list`, there are **two** `neighbour_cell_configuration` entrie
         plmn                = { mcc = 208; mnc = 93; mnc_length = 2 };
 ```
 
-##### 5. Edit the UE UICC configuration
+##### 4. Edit the UE UICC configuration
 Finally, edit `uicc0` in `~/L25GC-plus/openairinterface5g/ci-scripts/conf_files/nrue.uicc.conf`:
 ```bash
 uicc0 = {
@@ -379,11 +409,6 @@ uicc0 = {
   pdu_sessions = ({ dnn = "internet"; nssai_sst = 0x01; nssai_sd = 0x010203; });
 }
 ```
-
-**Notes**:
-* Replace the example IP addresses above with the actual IP addresses in your FABRIC cluster.
-* The subnet ranges and interface names may differ across testbeds.
-* Be sure that the PLMN, slice, and UE subscription settings are consistent across the gNB, neighbor configuration, UE, and core network.
 
 ## 3. Log into the DN node and Setup Environment
 Open **a new terminal** and SSH into your assigned DN node.
@@ -405,23 +430,32 @@ cd ~/L25GC-plus/
 ### Step-2: Add the L3 Route to UE
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
-On the DN node, add a route so that reply traffic to the UE subnet (or a specific UE IP such as `10.60.0.1`) is sent through the UPF-U N6 interface:
+On the DN node, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
+
+In this tutorial, the UE is assigned the default IP address `10.60.0.1`. If your setup uses a different UE IP, replace `10.60.0.1` accordingly. Note that `10.60.0.1` is not taken from the FABRIC interface table; it is the UE IP defined by the tutorial configuration.
 
 ```bash
 # On the DN node:
-sudo ip route add <UE_IP_or_SUBNET> via <N6_IP_on_UPF_U> dev <N6_INTERFACE_on_DN>
-
-# Example:
-sudo ip route add 10.60.0.1 via 10.133.10.3 dev enp7s0
+sudo ip route add 10.60.0.1 via <IP of cn_node-n6-p1> dev <Device of dn_node-n6-p1>
 ```
 
-- Here, `10.133.10.3` is the **UPF-U N6 IP**. It should match the `upf_n6_ip` configured in:
+You can find these values directly from the FABRIC **Interfaces** table by matching the **Name** column:
 
-  ```bash
-  ~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
-  ```
+* Find the row named `cn_node-n6-p1`, and use its **IP Address** as the next-hop (`via`) IP.
+* Find the row named `dn_node-n6-p1`, and use its **Device** as the outgoing interface (`dev`).
 
-- `N6_INTERFACE_on_DN` is the local network interface on the DN node that is connected to the **Subnet-3** as the UPF-U's N6 interface. In the example above, this interface is `enp7s0`.
+![Add L3 Route to UE](./add-ue-route.png)
+
+In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
+
+* `cn_node-n6-p1` → `IP Address = 10.147.132.3`
+* `dn_node-n6-p1` → `Device = enp7s0`
+
+So the route becomes:
+
+```bash
+sudo ip route add 10.60.0.1 via 10.147.132.3 dev enp7s0
+```
 
 ---
 
@@ -466,7 +500,7 @@ sudo ./nr-uesoftmodem -r 106 --numerology 1 --band 78 -C 3619200000 --rfsim --ui
 ```
 Log should shows "PDU Session establishment successful".
 
-Use `ip a` to check whether the tunnel `oaitun_ue1 ` presented, if it exists, pdu session setup is success!✅
+Use `ip a` to check whether the tunnel `oaitun_ue1` presented, if it exists, pdu session setup is success!✅
 
 ### Handover experiment
 
