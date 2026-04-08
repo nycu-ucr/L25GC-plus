@@ -71,7 +71,7 @@ git clone https://github.com/nycu-ucr/L25GC-plus.git
 ### Step-1: Install MLNX_OFED on the Core Network node
 ```bash
 cd ~/L25GC-plus/scripts
-./install_ofed.sh
+bash ./install_ofed.sh
 ```
 
 ### Step-2: Run the setup script to install L25GC+ on the Core Network node
