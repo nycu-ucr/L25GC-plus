@@ -479,7 +479,7 @@ Services on the CN node must be started in this order:
 
 ⚠️ OAI gNB does not support multiple slice rules, please edit and remove rules make subscribers as follow image.
 
-![subscriber](./images/subscriber.png)
+![subscriber](./subscriber.png)
 
 Startup command please refer to:
 * [Running L25GC+](https://github.com/nycu-ucr/L25GC-plus/tree/main/README.md#running-l25gc)
