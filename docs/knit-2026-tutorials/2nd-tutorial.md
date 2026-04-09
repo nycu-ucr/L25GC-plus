@@ -92,38 +92,54 @@ If no subscriber has been created yet, you will see a page showing **No Subscrip
 Click **CREATE** to add a new UE subscriber.
 
 <p align="center">
-  <img src="./webconsole/webconsole-create-sub-button.png" alt="WebConsole Login" width="30%">
+  <img src="./webconsole/webconsole-create-sub-button.png" alt="WebConsole Create Sub Button" width="30%">
 </p>
 
-##### (3) Go to the bottom of the subscriber creation page
+##### (3) Remove the default flow rules
 You will be taken to the subscriber creation page.
 
-For this tutorial, the required fields are already filled in.  
-Scroll down to the bottom of the page.
+Most fields are already pre-filled for this tutorial, but you need to make one manual change.
 
 <p align="center">
-  <img src="./webconsole/webconsole-create-sub-panel.png" alt="WebConsole Login" width="70%">
+  <img src="./webconsole/webconsole-create-sub-panel.png" alt="WebConsole Create Sub Panel" width="70%">
 </p>
+
+Each subscriber includes two slices by default, and each slice contains a **Flow Rule**.  
+Since the later experiments use **OAI gNB**, and **OAI gNB does not support multiple slice rules**, you need to remove the default flow rule(s) before creating the subscriber.
+
+In the **Flow Rules** section, click the red **DELETE** button at the upper-right corner of the rule panel to remove the rule.
+
+<p align="center">
+  <img src="./webconsole/webconsole-flow-rule-1.png" alt="Delete the default flow rule" width="70%">
+</p>
+
+Do the same for the 2nd slice.
+
+<p align="center">
+  <img src="./webconsole/webconsole-flow-rule-2.png" alt="Delete the default flow rule in the other slice" width="70%">
+</p>
+
+Then scroll to the bottom of the page and click **CREATE**.
 
 ##### (4) Create the subscriber
 At the bottom of the page, click **CREATE** to create the UE subscription.
 
 <p align="center">
-  <img src="./webconsole/webconsole-create-sub-final.png" alt="WebConsole Login" width="70%">
+  <img src="./webconsole/webconsole-create-sub-final.png" alt="WebConsole Create Sub Final" width="70%">
 </p>
 
 ##### (5) Confirm the creation
 After the subscriber is created successfully, the Webconsole will return to the subscriber list page, where you should see the new subscriber entry.
 
 <p align="center">
-  <img src="./webconsole/webconsole-done.png" alt="WebConsole Login" width="70%">
+  <img src="./webconsole/webconsole-done.png" alt="WebConsole Done" width="70%">
 </p>
 
 ---
 
 ### Step-1: Testing L25GC+ with UERANsim
 
-> In this experiment, we will bring up all NFs for L25GC+ on the CN node. Then we will bring up the UERANsim's gNB and UE on the UERAN node. We will next test the connectivity between the UERAN node and DN node via ping. We will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
+> In this experiment, we will bring up all NFs for L25GC+ on the CN node. Then we will bring up the UERANsim's gNB and UE on the UERAN node to trigger UE Registration and PDU Session Establishment. We will next test the connectivity between the UERAN node and DN node via ping. We will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
 
 ---
 
