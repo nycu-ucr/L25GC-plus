@@ -71,7 +71,7 @@ You will be assigned a specific group at the beginning of the tutorial.
 
 ---
 
-### Step-1. Log into the UE/RAN node and Setup Environment
+### Step-1: Log into the UE/RAN node and Setup Environment
 Open **a new terminal** and SSH into your assigned UE/RAN node.
 
 After you log in, run these commands in the terminal.
@@ -91,34 +91,37 @@ yes y | ./scripts/setup.sh ue
 #### (3) Add the L3 Route to DN server
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
-On the UERAN node, add a route so that traffic destined for the DN server is sent through the UPF-U's N3 interface:
+On the **UERAN node**, add a route so that traffic destined for the DN server is sent through the **UPF-U's N3 interface**:
 ```bash
-# On the UERAN node:
 sudo ip route add <IP of dn_node-n6-p1> via <IP of cn_node-n3-p1> dev <Device of ueran_node-n3-p1>
 ```
 
-You can find these values directly from the FABRIC **Interfaces** table by matching the **Name** column:
+<!-- ![Interface Summary Table](./iface_summary_table.png) -->
 
-* Find the row named `dn_node-n6-p1`, and use its **IP Address** as the destination IP.
-* Find the row named `cn_node-n3-p1`, and use its **IP Address** as the next-hop (`via`) IP.
-* Find the row named `ueran_node-n3-p1`, and use its **Device** as the outgoing interface (`dev`).
+Specifically:
 
-![Add L3 Route to DN server](./add-dn-route.png)
+* use the **DN node N6 IP** as the destination IP
+* use the **CN node N3 IP** as the next-hop (`via`) IP
+* use the **UERAN node N3 physical device** as the outgoing interface (`dev`)
 
-In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
+For example, in the table above:
 
-* `dn_node-n6-p1` → `IP Address = 10.147.132.2`
-* `cn_node-n3-p1` → `IP Address = 10.147.131.3`
-* `ueran_node-n3-p1` → `Device = enp8s0`
+* **DN node N6 IP** = `192.168.3.2`
+* **CN node N3 IP** = `192.168.2.2`
+* **UERAN node N3 device** = `enp7s0`
 
-So the route becomes:
+So the command becomes:
 
 ```bash
-sudo ip route add 10.147.132.2 via 10.147.131.3 dev enp8s0
+sudo ip route add 192.168.3.2 via 192.168.2.2 dev enp7s0
 ```
 
+**Important:** the physical device names on your assigned **UERAN node** may be different from those shown in the example table above. In particular, the devices corresponding to the **N2** and **N3** interfaces may vary across nodes. Therefore, before running the command, you should carefully identify which physical interface on your UERAN node is connected to **subnet-2 / N3**, and use that device name in the `dev` field.
+
+A simple way to verify this is to check which interface on the UERAN node has the **N3-side IP address** (`192.168.2.1`) and make sure it matches the interface connected to **subnet-2**.
+
 #### (4) Configure UERANsim
-> This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your FABRIC cluster.
+> This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your assigned cluster.
 
 The UERANsim gNB configuration file is located at:
 ```bash
@@ -129,41 +132,27 @@ Replace:
 
 ```yaml
 ...
-  ngapIp: 127.0.0.1   # gNB's N2 Interface IP address
-  gtpIp: 127.0.0.1    # gNB's N3 Interface IP address
+ngapIp: 127.0.0.1   # gNB's N2 Interface IP address
+gtpIp: 127.0.0.1    # gNB's N3 Interface IP address
 
-  amfConfigs:
-    - address: 127.0.0.1 # AMF's N2 interface IP address
+amfConfigs:
+  - address: 127.0.0.1 # AMF's N2 interface IP address
 ```
 
 with:
 
 ```yaml
 ...
-  ngapIp: {IP of ueran_node-n2-p1}   # gNB's N2 Interface IP address
-  gtpIp:  {IP of ueran_node-n3-p1}   # gNB's N3 Interface IP address
+ngapIp: 192.168.1.1      # gNB's N2 Interface IP address
+gtpIp:  192.168.2.1      # gNB's N3 Interface IP address
 
-  amfConfigs:
-    - address: {IP of cn_node-n2-p1}      # AMF's N2 interface IP address
+amfConfigs:
+  - address: 192.168.1.2 # AMF's N2 interface IP address
 ```
-
-Make sure these values match the actual interface IP addresses in your own FABRIC cluster. You can find them directly from the FABRIC **Interfaces** table by matching the **Name** column:
-
-* `ngapIp` should be set to the **IP Address** of `ueran_node-n2-p1`, which is the gNB's **N2 interface IP**.
-* `gtpIp` should be set to the **IP Address** of `ueran_node-n3-p1`, which is the gNB's **N3 interface IP**.
-* `amfConfigs.address` should be set to the **IP Address** of `cn_node-n2-p1`, which is the AMF's **N2 interface IP**.
-
-In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
-
-* `ueran_node-n2-p1` → `IP Address = 10.147.130.3`, so `ngapIp: 10.147.130.3`
-* `ueran_node-n3-p1` → `IP Address = 10.147.131.2`, so `gtpIp: 10.147.131.2`
-* `cn_node-n2-p1` → `IP Address = 10.147.130.2`, so `amfConfigs.address: 10.147.130.2`
-
-![UERANsim Configuration](./ueransim-config.png)
 
 ---
 
-### Step-2. Log into the DN node and Setup Environment
+### Step-2: Log into the DN node and Setup Environment
 Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
@@ -183,36 +172,17 @@ yes y | ./scripts/setup.sh dn
 #### (3) Add the L3 Route to UE
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
-On the DN node, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
+On the **DN node**, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
 
 In this tutorial, the UE is assigned the default IP address `10.60.0.1`. If your setup uses a different UE IP, replace `10.60.0.1` accordingly. Note that `10.60.0.1` is not taken from the FABRIC interface table; it is the UE IP defined by the tutorial configuration.
 
 ```bash
-# On the DN node:
-sudo ip route add 10.60.0.1 via <IP of cn_node-n6-p1> dev <Device of dn_node-n6-p1>
-```
-
-You can find these values directly from the FABRIC **Interfaces** table by matching the **Name** column:
-
-* Find the row named `cn_node-n6-p1`, and use its **IP Address** as the next-hop (`via`) IP.
-* Find the row named `dn_node-n6-p1`, and use its **Device** as the outgoing interface (`dev`).
-
-![Add L3 Route to UE](./add-ue-route.png)
-
-In the example shown in [Example FABRIC Network and Interface Configuration](#example-fabric-network-and-interface-configuration):
-
-* `cn_node-n6-p1` → `IP Address = 10.147.132.3`
-* `dn_node-n6-p1` → `Device = enp7s0`
-
-So the route becomes:
-
-```bash
-sudo ip route add 10.60.0.1 via 10.147.132.3 dev enp7s0
+sudo ip route add 10.60.0.1 via 192.168.3.1 dev enp7s0
 ```
 
 ---
 
-### Step-3. Testing L25GC+ with UERANsim (PDU Session Establishment, ping, iperf3)
+### Step-3: Testing L25GC+ with UERANsim (PDU Session Establishment, ping, iperf3)
 
 > In this experiment, you will bring up the UERANsim's gNB and UE on the UERAN node. You will next test the connectivity between the UERAN node and DN node via ping. You will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
 
