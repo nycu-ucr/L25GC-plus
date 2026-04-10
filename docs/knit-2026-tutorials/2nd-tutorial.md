@@ -319,9 +319,9 @@ Please follow the startup order below.
 ```bash
 cd ~/L25GC-plus/openairinterface5g/cmake_targets/ran_build/build
 sudo ./nr-softmodem -O ../../../targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci0.rfsim.conf --telnetsrv --telnetsrv.shrmod ci --gNBs.[0].min_rxtxtime 6 --rfsim --rfsimulator.[0].serveraddr 127.0.0.1
-````
+```
 
-# > The log should show `Received NGSetupResponse from AMF`.
+<!-- > The log should show `Received NGSetupResponse from AMF`. -->
 
 **Terminal 2: Run the OAI UE**
 
