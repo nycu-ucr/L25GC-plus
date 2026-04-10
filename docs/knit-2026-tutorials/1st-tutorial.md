@@ -76,51 +76,27 @@ Open **a new terminal** and SSH into your assigned UE/RAN node.
 
 After you log in, run these commands in the terminal.
 
-#### (1) Clone L25GC+ Repository
-```bash
-cd ~/
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-```
-
-#### (2) Run the setup script to install UERANsim
+#### (1) Run the setup script to install UERANsim
+The **L25GC+** repository has already been cloned on the node for you. You only need to enter the repository directory and run the setup script:
 ```bash
 cd ~/L25GC-plus/
 yes y | ./scripts/setup.sh ue
 ```
 
-#### (3) Add the L3 Route to DN server
+#### (2) Add the L3 Route to DN server
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the **UERAN node**, add a route so that traffic destined for the DN server is sent through the **UPF-U's N3 interface**:
 ```bash
-sudo ip route add <IP of dn_node-n6-p1> via <IP of cn_node-n3-p1> dev <Device of ueran_node-n3-p1>
+sudo ip route add 192.168.3.2 via 192.168.2.2
 ```
-
-<!-- ![Interface Summary Table](./iface_summary_table.png) -->
 
 Specifically:
 
-* use the **DN node N6 IP** as the destination IP
-* use the **CN node N3 IP** as the next-hop (`via`) IP
-* use the **UERAN node N3 physical device** as the outgoing interface (`dev`)
+* use the **DN node N6 IP** (`192.168.3.2`) as the destination IP
+* use the **CN node N3 IP** (`192.168.2.2`) as the next-hop (`via`) IP
 
-For example, in the table above:
-
-* **DN node N6 IP** = `192.168.3.2`
-* **CN node N3 IP** = `192.168.2.2`
-* **UERAN node N3 device** = `enp7s0`
-
-So the command becomes:
-
-```bash
-sudo ip route add 192.168.3.2 via 192.168.2.2 dev enp7s0
-```
-
-**Important:** the physical device names on your assigned **UERAN node** may be different from those shown in the example table above. In particular, the devices corresponding to the **N2** and **N3** interfaces may vary across nodes. Therefore, before running the command, you should carefully identify which physical interface on your UERAN node is connected to **subnet-2 / N3**, and use that device name in the `dev` field.
-
-A simple way to verify this is to check which interface on the UERAN node has the **N3-side IP address** (`192.168.2.1`) and make sure it matches the interface connected to **subnet-2**.
-
-#### (4) Configure UERANsim
+#### (3) Configure UERANsim
 > This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your assigned cluster.
 
 The UERANsim gNB configuration file is located at:
@@ -157,28 +133,23 @@ Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
 
-#### (1) Clone L25GC+ Repository
-```bash
-cd ~/
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-```
-
-#### (2) Run the setup script to install iperf3
+#### (1) Run the setup script to install iperf3
+The **L25GC+** repository has already been cloned on the node for you. You only need to enter the repository directory and run the setup script:
 ```bash
 cd ~/L25GC-plus/
 yes y | ./scripts/setup.sh dn
 ```
 
-#### (3) Add the L3 Route to UE
+#### (2) Add the L3 Route to UE
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the **DN node**, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
 
-In this tutorial, the UE is assigned the default IP address `10.60.0.1`. If your setup uses a different UE IP, replace `10.60.0.1` accordingly. Note that `10.60.0.1` is not taken from the FABRIC interface table; it is the UE IP defined by the tutorial configuration.
-
 ```bash
-sudo ip route add 10.60.0.1 via 192.168.3.1 dev enp7s0
+sudo ip route add 10.60.0.1 via 192.168.3.1
 ```
+
+> In this tutorial, the UE is assigned the default IP address `10.60.0.1`.
 
 ---
 
