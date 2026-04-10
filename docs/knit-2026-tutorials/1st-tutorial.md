@@ -71,24 +71,24 @@ You will be assigned a specific group at the beginning of the tutorial.
 
 ---
 
-## Step-1. Log into the UE/RAN node and Setup Environment
+### Step-1. Log into the UE/RAN node and Setup Environment
 Open **a new terminal** and SSH into your assigned UE/RAN node.
 
 After you log in, run these commands in the terminal.
 
-### Clone L25GC+ Repository
+#### (1) Clone L25GC+ Repository
 ```bash
 cd ~/
 git clone https://github.com/nycu-ucr/L25GC-plus.git
 ```
 
-### Step-1: Run the setup script to install UERANsim
+#### (2) Run the setup script to install UERANsim
 ```bash
 cd ~/L25GC-plus/
 yes y | ./scripts/setup.sh ue
 ```
 
-### Step-2: Add the L3 Route to DN server
+#### (3) Add the L3 Route to DN server
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the UERAN node, add a route so that traffic destined for the DN server is sent through the UPF-U's N3 interface:
@@ -117,7 +117,7 @@ So the route becomes:
 sudo ip route add 10.147.132.2 via 10.147.131.3 dev enp8s0
 ```
 
-### Step-3: Configure UERANsim
+#### (4) Configure UERANsim
 > This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your FABRIC cluster.
 
 The UERANsim gNB configuration file is located at:
@@ -163,24 +163,24 @@ In the example shown in [Example FABRIC Network and Interface Configuration](#ex
 
 ---
 
-## Step-2. Log into the DN node and Setup Environment
+### Step-2. Log into the DN node and Setup Environment
 Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
 
-### Clone L25GC+ Repository
+#### (1) Clone L25GC+ Repository
 ```bash
 cd ~/
 git clone https://github.com/nycu-ucr/L25GC-plus.git
 ```
 
-### Step-1: Run the setup script to install iperf3
+#### (2) Run the setup script to install iperf3
 ```bash
 cd ~/L25GC-plus/
 yes y | ./scripts/setup.sh dn
 ```
 
-### Step-2: Add the L3 Route to UE
+#### (3) Add the L3 Route to UE
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the DN node, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
@@ -212,6 +212,72 @@ sudo ip route add 10.60.0.1 via 10.147.132.3 dev enp7s0
 
 ---
 
-## 3. Testing L25GC+ with UERANsim (PDU Session Establishment, ping, iperf3)
+### Step-3. Testing L25GC+ with UERANsim (PDU Session Establishment, ping, iperf3)
 
-> In this experiment, we will bring up all NFs for L25GC+ on the CN node. Then we will bring up the UERANsim's gNB and UE on the UERAN node. We will next test the connectivity between the UERAN node and DN node via ping. We will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
+> In this experiment, you will bring up the UERANsim's gNB and UE on the UERAN node. You will next test the connectivity between the UERAN node and DN node via ping. You will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
+
+**Note:** The following experiments will require multiple terminal sessions. If you are familiar with a terminal multiplexer such as **tmux** or **byobu**, using one will make the workflow much easier. Otherwise, you can simply open multiple terminal windows manually.  
+
+For each step, we will clearly state how many terminals you need. Please pay close attention to those instructions before proceeding.
+
+#### (1) Log in to the UE/RAN node and run UERANSIM
+
+After L25GC+ has been started on the CN node, open **two new terminals** and SSH into your assigned **UE/RAN node** in both of them.
+
+In this step, you will use these two terminals to start the UERANSIM components in the following order:
+
+- **Terminal 1:** gNB
+- **Terminal 2:** UE
+
+Please start the **gNB first**, and then start the **UE**.
+
+During this process, the UE will attach to the gNB and register with L25GC+, which will trigger **UE registration** and **PDU session establishment**.
+
+1. **Terminal 1: Run gNB**
+    ```bash
+    cd ~/L25GC-plus/UERANSIM
+    sudo ./build/nr-gnb -c config/free5gc-gnb.yaml
+    ```
+
+2. **Terminal 2: Run UE**
+    ```bash
+    cd ~/L25GC-plus/UERANSIM
+    sudo ./build/nr-ue -c config/free5gc-ue.yaml
+    ```
+
+> After the PDU session establishment is complete, UERANSIM will create a UE endpoint interface in the UE/RAN node's network stack. The interface is named `uesimtun0` and has the IP address `10.60.0.1`. This is the UE-side interface that will be used in the following connectivity and traffic experiments.
+
+#### (2) Ping test between the UE and the DN server
+
+Open **one new terminal** and SSH into your **UE/RAN node**.
+
+After the PDU session has been established, run the following command to test connectivity from the UE endpoint `uesimtun0` to the DN server:
+
+```bash
+ping -I uesimtun0 192.168.3.2
+```
+> Note: In our FABRIC artifact, `192.168.3.2` is the default IP address of the N6 interface on the DN node.
+
+After verifying that the ping succeeds, press `Ctrl+C` to stop the ping test, and then proceed to the `iperf3` throughput test.
+
+
+#### (3) `iperf3` throughput test between the UE and the DN server
+
+Open **two new terminals**:
+
+- **Terminal 1:** SSH into the **DN node** and run the `iperf3` server
+- **Terminal 2:** SSH into the **UE/RAN node** and run the `iperf3` client
+
+First, start the `iperf3` server on the **DN node**:
+
+```bash
+iperf3 -s -B 192.168.3.2
+````
+
+Then, in the other terminal, run the `iperf3` client on the **UE/RAN node**:
+
+```bash
+iperf3 -c 192.168.3.2 -B 10.60.0.1
+```
+
+> In this test, `192.168.3.2` is the default **DN N6 IP address** used by our FABRIC artifact, and `10.60.0.1` is the IP address of the UE interface `uesimtun0` created by UERANSIM after PDU session establishment.
