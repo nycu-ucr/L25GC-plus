@@ -18,10 +18,11 @@ DEFAULT_ONVM_MGR_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf"
 DEFAULT_PORTMASK="3"
 DEFAULT_NF_COREMASK="0xFFF8"
 DEFAULT_OUTPUT="stdout"
+DEFAULT_ALLOW_PCI_LIST="0000:08:00.0 0000:09:00.0"
 
 # Usage function
 usage() {
-  echo "Usage: $0 [-p ONVM_MGR_PATH] [-k PORTMASK] [-n NF_COREMASK] [-s OUTPUT]"
+  echo "Usage: $0 [-p ONVM_MGR_PATH] [-k PORTMASK] [-n NF_COREMASK] [-s OUTPUT] [-a ALLOW_PCI_LIST]"
   echo
   echo "  -p ONVM_MGR_PATH   Path to ONVM-UPF (default: $DEFAULT_ONVM_MGR_PATH)"
   echo "  -k PORTMASK        DPDK portmask passed to start.sh -k (default: $DEFAULT_PORTMASK)"
@@ -29,16 +30,19 @@ usage() {
   echo "  -n NF_COREMASK     NF coremask passed to start.sh -n (default: $DEFAULT_NF_COREMASK)"
   echo "                     Example: 0xF0 -> cores 4-7 for NFs"
   echo "  -s OUTPUT          Stats/output mode (web|stdout) (default: $DEFAULT_OUTPUT)"
+  echo "  -a ALLOW_PCI_LIST  List of PCI devices to allow (default: $DEFAULT_ALLOW_PCI_LIST)"
+  echo "                     Example: -a \"0000:08:00.0 0000:09:00.0\""
   exit 1
 }
 
 # Parse input arguments
-while getopts "p:k:n:s:h" opt; do
+while getopts "p:k:n:s:a:h" opt; do
   case $opt in
     p) ONVM_MGR_PATH="$OPTARG" ;;
     k) PORTMASK="$OPTARG" ;;
     n) NF_COREMASK="$OPTARG" ;;
     s) OUTPUT="$OPTARG" ;;
+    a) ALLOW_LIST="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -49,6 +53,7 @@ ONVM_MGR_PATH="${ONVM_MGR_PATH:-$DEFAULT_ONVM_MGR_PATH}"
 PORTMASK="${PORTMASK:-$DEFAULT_PORTMASK}"
 NF_COREMASK="${NF_COREMASK:-$DEFAULT_NF_COREMASK}"
 OUTPUT="${OUTPUT:-$DEFAULT_OUTPUT}"
+ALLOW_LIST="${ALLOW_LIST:-$DEFAULT_ALLOW_PCI_LIST}"
 
 # Check that the directory exists
 if [ ! -d "$ONVM_MGR_PATH" ]; then
@@ -65,4 +70,6 @@ sleep 1.0
 
 # Launch ONVM_MGR with specified arguments
 echo "[INFO] Starting ONVM_MGR with options: -k $PORTMASK -n $NF_COREMASK -s $OUTPUT"
-./scripts/start.sh -k "$PORTMASK" -n "$NF_COREMASK" -s "$OUTPUT"
+echo "[INFO] Using PCI allow list: $ALLOW_LIST"
+
+ONVM_ALLOW_LIST="$ALLOW_LIST" ./scripts/start.sh -k "$PORTMASK" -n "$NF_COREMASK" -s "$OUTPUT"
