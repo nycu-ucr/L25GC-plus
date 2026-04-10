@@ -82,7 +82,7 @@ Use the following default credentials:
 - **Password:** `free5gc`
 
 <p align="center">
-  <img src="./webconsole/webconsole-login.png" alt="WebConsole Login" width="30%">
+  <img src="./webconsole/webconsole-login.png" alt="WebConsole Login" width="50%">
 </p>
 
 ##### (2) Go to **SUBSCRIBERS**
@@ -92,7 +92,7 @@ If no subscriber has been created yet, you will see a page showing **No Subscrip
 Click **CREATE** to add a new UE subscriber.
 
 <p align="center">
-  <img src="./webconsole/webconsole-create-sub-button.png" alt="WebConsole Create Sub Button" width="30%">
+  <img src="./webconsole/webconsole-create-sub-button.png" alt="WebConsole Create Sub Button" width="50%">
 </p>
 
 ##### (3) Remove the default flow rules
@@ -135,75 +135,147 @@ After the subscriber is created successfully, the Webconsole will return to the 
   <img src="./webconsole/webconsole-done.png" alt="WebConsole Done" width="70%">
 </p>
 
----
-
-### Step-1: Testing L25GC+ with UERANsim
-
-> In this experiment, we will bring up all NFs for L25GC+ on the CN node. Then we will bring up the UERANsim's gNB and UE on the UERAN node to trigger UE Registration and PDU Session Establishment. We will next test the connectivity between the UERAN node and DN node via ping. We will finally do the throughput test between the UE (iperf3 client) and the DN server (iperf3 server).
+> At this point, you can close the Webconsole in your browser and terminate the SSH local port forwarding session, since it will not be needed for the rest of the tutorial.
 
 ---
 
-## 1. Log into the Core Network node and Setup Environment
-Open **a new terminal** and SSH into your assigned Core Network node.
+### Step-2: Testing L25GC+ with UERANsim
+> In this experiment, we will first bring up all NFs of L25GC+ on the CN node. Then we will start the UERANSIM gNB and UE on the UERAN node to trigger UE registration and PDU session establishment. Next, we will test connectivity between the UERAN node and the DN node using ping. Finally, we will run a throughput test between the UE (as the iperf3 client) and the DN server (as the iperf3 server).
 
-After you log in, run these commands in the terminal.
+**Note:** The following experiments will require multiple terminal sessions. If you are familiar with a terminal multiplexer such as **tmux** or **byobu**, using one will make the workflow much easier. Otherwise, you can simply open multiple terminal windows manually.  
 
-### Clone L25GC+ Repository
+For each step, we will clearly state how many terminals you need. Please pay close attention to those instructions before proceeding.
+
+#### (1) Log in to the Core Network node and start L25GC+
+
+Open **four new terminals** and SSH into your **Core Network (CN) node** in all of them.
+
+In this step, you will use these four terminals to start the main L25GC+ components on the CN node:
+
+- **Terminal 1:** ONVM Manager
+- **Terminal 2:** UPF-U
+- **Terminal 3:** UPF-C
+- **Terminal 4:** Remaining control-plane NFs
+
+Before starting the ONVM Manager, you need to identify the PCIe addresses of the **N3** and **N6** interfaces on your **CN node**.
+
+During slice creation, the artifact prints an **interface summary table**. Please look at the interface summary table for **your own slice**, find the rows corresponding to:
+
+- **cn_node, N3**
+- **cn_node, N6**
+
+and copy their **PCIe Address** values.
+
+An example is shown below:
+
+<p align="center">
+  <img src="./iface_summary_table.png" alt="Interface Summary Table" width="75%">
+</p>
+
+In this example:
+- the **N3** interface PCIe address is `0000:09:00.0`
+- the **N6** interface PCIe address is `0000:07:00.0`
+
+Replace `N3_IF_PCIE` and `N6_IF_PCIE` in the ONVM Manager command below with the PCIe addresses from **your own** interface summary table.
+
+1. **Terminal 1: Run ONVM Manager**
+    ```bash
+    cd ~/L25GC-plus/
+    ./scripts/run/run_onvm_mgr.sh -a "<N3_IF_PCIE> <N6_IF_PCIE>"
+    ```
+
+2. **Terminal 2: Run UPF-U**
+    ```bash
+    cd ~/L25GC-plus/
+    ./scripts/run/run_upf_u.sh 1 ./NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml
+    ```
+
+3. **Terminal 3: Run UPF-C**
+    ```bash
+    cd ~/L25GC-plus/
+    ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c/config/upfcfg.yaml
+    ```
+
+4. **Terminal 4: Run the remaining control-plane NFs**
+    ```bash
+    cd ~/L25GC-plus/
+    source ~/.bashrc
+    ./scripts/run/run_cp_nfs.sh && reset
+    ```
+
+#### (2) Log in to the UE/RAN node and run UERANSIM
+
+After L25GC+ has been started on the CN node, open **two new terminals** and SSH into your assigned **UE/RAN node** in both of them.
+
+In this step, you will use these two terminals to start the UERANSIM components in the following order:
+
+- **Terminal 1:** gNB
+- **Terminal 2:** UE
+
+Please start the **gNB first**, and then start the **UE**.
+
+During this process, the UE will attach to the gNB and register with L25GC+, which will trigger **UE registration** and **PDU session establishment**.
+
+1. **Terminal 1: Run gNB**
+    ```bash
+    cd ~/L25GC-plus/UERANSIM
+    sudo ./build/nr-gnb -c config/free5gc-gnb.yaml
+    ```
+
+2. **Terminal 2: Run UE**
+    ```bash
+    cd ~/L25GC-plus/UERANSIM
+    sudo ./build/nr-ue -c config/free5gc-ue.yaml
+    ```
+
+> After the PDU session establishment is complete, UERANSIM will create a UE endpoint interface in the UE/RAN node's network stack. The interface is named `uesimtun0` and has the IP address `10.60.0.1`. This is the UE-side interface that will be used in the following connectivity and traffic experiments.
+
+#### (3) Ping test between the UE and the DN server
+
+Open **one new terminal** and SSH into your **UE/RAN node**.
+
+After the PDU session has been established, you can test end-to-end connectivity from the UE to the DN server by sending ICMP echo requests through the UE tunnel interface `uesimtun0`.
+
+To run this test, you need the IP address of the **N6 interface on the DN node**.
+
+You can find this IP address in the **interface summary table** printed by the artifact during slice creation.  
+Please look at the row corresponding to:
+
+- **dn_node, N6**
+
+and copy its **IP Address** value.
+
+An example is shown below:
+
+<p align="center">
+  <img src="./dn_n6_ip.png" alt="DN node N6 IP in interface summary table" width="85%">
+</p>
+
+In this example, the **DN node N6 IP address** is `192.168.3.2`.
+
+Then run the following command on the **UE/RAN node**:
+
 ```bash
-cd ~/
-git clone https://github.com/nycu-ucr/L25GC-plus.git
+ping -I uesimtun0 <DN_N6_IP>
 ```
+> Replace `<DN_N6_IP>` with the N6 IP address of your own DN node.
 
-### Step-1: Install MLNX_OFED on the Core Network node
-```bash
-cd ~/L25GC-plus/scripts
-yes y | bash ./install_ofed.sh
-```
+#### (4) iperf3 test between UE and the DN server
 
-### Step-2: Run the setup script to install L25GC+ on the Core Network node
-```bash
-cd ~/L25GC-plus/
-yes y | ./scripts/setup.sh cn
-```
-
-
-
-## 2. Log into the UE/RAN node and Setup Environment
-Open **a new terminal** and SSH into your assigned UE/RAN node.
-
-After you log in, run these commands in the terminal.
-
-### Clone L25GC+ Repository
-```bash
-cd ~/
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-```
-
-### Step-1: Run the setup script to install UERANsim and OAI UE/RAN
-```bash
-cd ~/L25GC-plus/
-yes y | ./scripts/setup.sh ue
-```
-
-## 3. Log into the DN node and Setup Environment
+First Log into the DN node and run iperf3 server:
 Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
 
-### Clone L25GC+ Repository
-```bash
-cd ~/
-git clone https://github.com/nycu-ucr/L25GC-plus.git
-```
+#### (5) Clean up
 
-### Step-1: Run the setup script to install iperf3
-```bash
-cd ~/L25GC-plus/
-yes y | ./scripts/setup.sh dn
-```
+5. **Stop L25GC+**
+    ```bash
+    ./scripts/run/stop_cn.sh
+    ```
+
 
 ---
-
 
 
 ## 4. Testing L25GC+ with OAI UE/RAN (PDU Session Establishment + Handover)
