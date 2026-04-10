@@ -234,112 +234,155 @@ During this process, the UE will attach to the gNB and register with L25GC+, whi
 
 Open **one new terminal** and SSH into your **UE/RAN node**.
 
-After the PDU session has been established, you can test end-to-end connectivity from the UE to the DN server by sending ICMP echo requests through the UE tunnel interface `uesimtun0`.
-
-To run this test, you need the IP address of the **N6 interface on the DN node**.
-
-You can find this IP address in the **interface summary table** printed by the artifact during slice creation.  
-Please look at the row corresponding to:
-
-- **dn_node, N6**
-
-and copy its **IP Address** value.
-
-An example is shown below:
-
-<p align="center">
-  <img src="./dn_n6_ip.png" alt="DN node N6 IP in interface summary table" width="85%">
-</p>
-
-In this example, the **DN node N6 IP address** is `192.168.3.2`.
-
-Then run the following command on the **UE/RAN node**:
+After the PDU session has been established, run the following command to test connectivity from the UE endpoint `uesimtun0` to the DN server:
 
 ```bash
-ping -I uesimtun0 <DN_N6_IP>
+ping -I uesimtun0 192.168.3.2
 ```
-> Replace `<DN_N6_IP>` with the N6 IP address of your own DN node.
+> Note: In our FABRIC artifact, `192.168.3.2` is the default IP address of the N6 interface on the DN node.
 
-#### (4) iperf3 test between UE and the DN server
+After verifying that the ping succeeds, press `Ctrl+C` to stop the ping test, and then proceed to the `iperf3` throughput test.
 
-First Log into the DN node and run iperf3 server:
-Open **a new terminal** and SSH into your assigned DN node.
 
-After you log in, run these commands in the terminal.
+#### (4) `iperf3` throughput test between the UE and the DN server
+
+Open **two new terminals**:
+
+- **Terminal 1:** SSH into the **DN node** and run the `iperf3` server
+- **Terminal 2:** SSH into the **UE/RAN node** and run the `iperf3` client
+
+First, start the `iperf3` server on the **DN node**:
+
+```bash
+iperf3 -s -B 192.168.3.2
+````
+
+Then, in the other terminal, run the `iperf3` client on the **UE/RAN node**:
+
+```bash
+iperf3 -c 192.168.3.2 -B 10.60.0.1
+```
+
+> In this test, `192.168.3.2` is the default **DN N6 IP address** used by our FABRIC artifact, and `10.60.0.1` is the IP address of the UE interface `uesimtun0` created by UERANSIM after PDU session establishment.
 
 #### (5) Clean up
 
-5. **Stop L25GC+**
-    ```bash
-    ./scripts/run/stop_cn.sh
-    ```
+Before moving on to the OAI-based experiments, please stop the components started in this section.
 
+##### (a) Stop L25GC+ on the CN node
+Open **one new terminal**, SSH into your **CN node**, and run:
+
+```bash
+cd ~/L25GC-plus/
+./scripts/run/stop_cn.sh
+```
+
+This script stops the L25GC+ components running on the CN node.
+
+##### (b) Stop UERANSIM on the UE/RAN node
+
+Then go back to the UE/RAN terminals where you started **UERANSIM gNB** and **UERANSIM UE**, and stop both processes by pressing `Ctrl+C` in each terminal.
+
+After all of these components have been stopped, you can proceed to the OAI-based experiments.
 
 ---
 
+### Step-3: Testing L25GC+ with OAI UE/RAN (PDU Session Establishment + Handover)
 
-## 4. Testing L25GC+ with OAI UE/RAN (PDU Session Establishment + Handover)
+#### (1) Log in to the Core Network node and restart L25GC+
 
-### Startup Order
+In this step, you need to start L25GC+ on the **CN node** again.
 
-Services on the CN node must be started in this order:
+The procedure is the same as **[Step-2 (1)](#1-log-in-to-the-core-network-node-and-start-l25gc)**:
+- open the required terminals on the **CN node**,
+- start the **ONVM Manager**,
+- start **UPF-U**,
+- start **UPF-C**,
+- and then start the remaining **control-plane NFs**.
 
-1. **ONVM Manager** — wait until port info is printed
-2. **UPF-U** — wait for "NF_READY" message
-3. **UPF-C** — wait for "NF_READY" message
-4. **CP NFs** (`run_cp_nfs.sh`) — wait for "All NFs started"
-5. **Webconsole** - only need to be run once, please refer to [this](https://github.com/nycu-ucr/L25GC-plus/tree/main/docs/fabric_testbed#5-access-the-cn-web-console-from-your-laptop-ssh-tunnel).
+Please complete the CN-side startup first before moving on to the OAI UE/RAN startup.
 
-⚠️ OAI gNB does not support multiple slice rules, please edit and remove rules make subscribers as follow image.
+#### (2) Log in to the UE/RAN node and run OAI gNB and UE
 
-![subscriber](./subscriber.png)
+Open **four new terminals** and SSH into your **UE/RAN node** in all of them.
 
-Startup command please refer to:
-* [Running L25GC+](https://github.com/nycu-ucr/L25GC-plus/tree/main/README.md#running-l25gc)
+In this step, you will use these terminals as follows:
 
-Then on Node1 (UERAN):
+- **Terminal 1:** Run the first OAI gNB (source gNB)
+- **Terminal 2:** Run the OAI UE
+- **Terminal 3:** Run the second OAI gNB (target gNB)
+- **Terminal 4:** Correct the MTU of the UE tunnel interface
 
-6. **gNB**:
+Please follow the startup order below.
+
+**Terminal 1: Run the first OAI gNB (source)**
 ```bash
 cd ~/L25GC-plus/openairinterface5g/cmake_targets/ran_build/build
 sudo ./nr-softmodem -O ../../../targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci0.rfsim.conf --telnetsrv --telnetsrv.shrmod ci --gNBs.[0].min_rxtxtime 6 --rfsim --rfsimulator.[0].serveraddr 127.0.0.1
-```
-Log should shows "Received NGSetupResponse from AMF".
+````
 
-7. **UE**:
+> The log should show `Received NGSetupResponse from AMF`.
+
+**Terminal 2: Run the OAI UE**
+
 ```bash
 cd ~/L25GC-plus/openairinterface5g/cmake_targets/ran_build/build
 sudo ./nr-uesoftmodem -r 106 --numerology 1 --band 78 -C 3619200000 --rfsim --uicc0.imsi 208930000000001 -O ../../../ci-scripts/conf_files/nrue.uicc.conf --rfsimulator.[0].serveraddr server
 ```
-Log should shows "PDU Session establishment successful".
 
-Use `ip a` to check whether the tunnel `oaitun_ue1` presented, if it exists, pdu session setup is success!✅
+> The log should show `PDU Session establishment successful`.
 
-### Handover experiment
+You can also run `ip a` to check whether the tunnel interface `oaitun_ue1` is present. If `oaitun_ue1` exists, the PDU session establishment was successful.
 
-Continue with previous experiment, open another terminal on node 1 (UE/RAN) and start second gNB.
+**Terminal 3: Run the second OAI gNB (target)**
+
 ```bash
 cd ~/L25GC-plus/openairinterface5g/cmake_targets/ran_build/build
-sudo ./nr-softmodem -O ../../../targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci1.rfsim.conf   --rfsim --telnetsrv --telnetsrv.shrmod ci   --telnetsrv.listenport 9091   --gNBs.[0].min_rxtxtime 6   --rfsimulator.[0].serveraddr 127.0.0.1
+sudo ./nr-softmodem -O ../../../targets/PROJECTS/GENERIC-NR-5GC/CONF/gnb.sa.band78.fr1.106PRB.pci1.rfsim.conf --rfsim --telnetsrv --telnetsrv.shrmod ci --telnetsrv.listenport 9091 --gNBs.[0].min_rxtxtime 6 --rfsimulator.[0].serveraddr 127.0.0.1
 ```
-On fourth terminal set oaitun_ue1 MTU
+
+**Terminal 4: Correct the MTU of the UE endpoint**
+On the fourth terminal, set the MTU of `oaitun_ue1`:
+
 ```bash
 sudo ifconfig oaitun_ue1 mtu 1350
 ```
-Then, start iperf3 on ue and dn node to observe throughput before and after handover.
-```bash
-# On UE/RAN Node:
-iperf3 -c 192.168.2.2 -B 10.60.0.1
-```
-```bash
-# On DN Node:
-iperf3 -s -B 192.168.2.2
-```
-Replace `192.168.2.2` with the IP of your DN node. Assume 10.60.0.1 is the IP of UE (oaitun_ue1).
 
-Open a fifth terminal to trigger N2 handover,
+#### (3) Handover experiment
+
+To run the handover experiment, you will need:
+
+* **one new terminal** on the **DN node** for the `iperf3` server
+* **two new terminals** on the **UE/RAN node**
+
+  * one for the `iperf3` client
+  * one for triggering N2 handover
+
+First, open **one new terminal** and SSH into the **DN node**. Then start the `iperf3` server:
+
+**Terminal 1 (DN node): Run `iperf3` server**
+
+```bash
+iperf3 -s -B 192.168.3.2
+```
+
+Next, open **two new terminals** and SSH into the **UE/RAN node**.
+
+In the first UE/RAN terminal, start the `iperf3` client to send traffic from the UE to the DN server:
+
+**Terminal 2 (UE/RAN node): Run `iperf3` client**
+
+```bash
+iperf3 -c 192.168.3.2 -B 10.60.0.1 -t 1000
+```
+
+In the second UE/RAN terminal, trigger the N2 handover:
+
+**Terminal 3 (UE/RAN node): Trigger N2 handover**
+
 ```bash
 echo ci trigger_n2_ho 1,1 | nc 127.0.0.1 9090 && echo
 ```
-If you can see traffic on second gNB and iperf3 throughput drop to 0 and recover back, then 
-handover is success!✅
+
+> **How to verify that handover is successful:**
+> After the handover is triggered, observe the `iperf3` client throughput. You should see a short throughput drop, followed by recovery. At the same time, if you watch the terminals of the first gNB and the second gNB, you should see the traffic move from the first gNB to the second gNB. This indicates that the handover has completed successfully.
