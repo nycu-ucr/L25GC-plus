@@ -200,7 +200,7 @@ Replace `N3_IF_PCIE` and `N6_IF_PCIE` in the ONVM Manager command below with the
     ```bash
     cd ~/L25GC-plus/
     source ~/.bashrc
-    ./scripts/run/run_cp_nfs.sh && reset
+    ./scripts/run/run_cp_nfs.sh && reset && tail -f log/*.log
     ```
 
 #### (2) Log in to the UE/RAN node and run UERANSIM

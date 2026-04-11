@@ -3,13 +3,14 @@
 ![Architecture.png](ref_architecture.png)
 
 
-### Setting L25GC-plus Parameters (CN node)
+### 1. Setting L25GC-plus Parameters (CN node): AMF, SMF, UPF-U
 On CN node, we need to edit three files:
 
 - `~/L25GC-plus/config/amfcfg.yaml`
 - `~/L25GC-plus/config/smfcfg.yaml`
 - `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/upf_u.yaml`
 
+#### AMF Configuration:
 First SSH into the CN node, and change `~/L25GC-plus/config/amfcfg.yaml`:
 ```
 cd ~/L25GC-plus
@@ -29,6 +30,7 @@ into:
   - 128.105.144.114
 ```
 
+#### SMF Configuration:
 Next edit `~/L25GC-plus/config/smfcfg.yaml`:
 ```
 nano config/smfcfg.yaml
@@ -50,6 +52,7 @@ into:
        - 192.168.1.2
 ```
 
+#### UPF-U Configuration:
 Next edit `~/L25GC-plus/NFs/onvm-upf/5gc/upf_u/config/upf_u.yaml`:
 
 ```yaml
@@ -58,35 +61,19 @@ info:
   description: L25GC+ UPF-U Configuration
 
 configuration:
-  log_level: "warning" # trace, debug, info, warning, error, fatal, panic
+  log_level: "warning"  # trace, debug, info, warning, error, fatal, panic
   dataplane:
-    upf_access_ip: "192.168.1.2"    # UPF local IP on the access-facing port
-    upf_core_ip: "10.10.1.1"        # UPF local IP on the core/SGi-facing port
-    an_peer_ip: "192.168.1.1"       # Next-hop IP of the AN/gNB peer
-    dn_peer_ip: "10.10.1.2"         # Next-hop IP of the DN/upstream router peer
+    upf_n3_ip: "192.168.1.2"        # N3 interface IP address on the Core Network node
+    upf_n6_ip: "10.10.1.1"          # N6 interface IP address on the Core Network node
+    an_peer_n3_ip: "192.168.1.1"    # N3 interface IP address on the UE/RAN node
+    dn_peer_n6_ip: "10.10.1.2"      # N6 interface IP address on the DN node
 
     ports:
-      access: 0                     # ACCESS-facing DPDK port
-      core: 1                       # CORE-facing DPDK port
+      n3_port: 0                     # NIC port used for N3 interface
+      n6_port: 1                     # NIC port used for N6 interface
 ```
 
-Set the fields as follows:
-
-* `upf_access_ip`: the UPF local IP on the access-side interface
-* `upf_core_ip`: the UPF local IP on the core-side interface
-* `an_peer_ip`: the IP of the AN/gNB peer connected to the UPF access side
-* `dn_peer_ip`: the IP of the DN/upstream peer connected to the UPF core side
-* `ports.access`: the DPDK port connected to the access side
-* `ports.core`: the DPDK port connected to the core side
-
-For the example above:
-
-* `an_peer_ip: 192.168.1.1` corresponds to **UE/AN `ens1f0` IP**
-* `upf_access_ip: 192.168.1.2` corresponds to the **UPF-U access-side local IP on CN**
-* `upf_core_ip: 10.10.1.1` corresponds to the **UPF-U core-side local IP on CN**
-* `dn_peer_ip: 10.10.1.2` corresponds to **DN `ens1f1` IP**
-
-### Setting UERANSIM Parameters
+### 2. Setting UERANSIM Parameters
 In the UERAN node, there are two files related to L25GC-plus：
 
 - `~/L25GC-plus/UERANSIM/config/free5gc-gnb.yaml`
@@ -117,7 +104,7 @@ into:
 
 ---
 
-### Add L3 Routes on the UERAN Node and DN Node
+### 3. Add L3 Routes on the UERAN Node and DN Node
 
 On the DN node, add a route so that reply traffic to the UE subnet (or a specific UE IP such as `10.60.0.1`) is sent through the UPF-U core-side interface:
 
