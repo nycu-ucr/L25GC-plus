@@ -70,6 +70,13 @@ Then open in your laptop browser:
 
 > If port 5000 on your laptop is already in use, map a different local port (e.g., **15000 → 5000**).
 
+> If, during the tutorial, you find that your laptop does not have the required FABRIC SSH key/configuration set up, you may temporarily add the instructor’s FABRIC public key to `~/.ssh/authorized_keys` on your CN node so that the instructor can log in remotely and help you complete the WebConsole setup.
+
+Instructor FABRIC public key:
+```bash
+ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGbU/IhIb8EF9YFVpEgOpdjhOKES46KwOScKqbYdH9ddypzW84NJGTqKERDY7vOz60IAAOXkalYswCrfkhaQL7o= slice_key%
+```
+
 #### Provision UE Subscription Data
 Then follow the steps below to provision the UE subscription data.
 
