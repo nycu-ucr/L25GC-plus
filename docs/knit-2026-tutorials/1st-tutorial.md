@@ -51,23 +51,41 @@ Here is the server information we will be using:
 
 **Group A:**
 ```bash
-ubuntu@2001:400:a100:3020:f816:3eff:feb4:ceb2 # (UE/RAN node)
-ubuntu@2001:400:a100:3020:f816:3eff:fef8:6210 # (Data Network node)
+# Slice name: L25GC-1cde01d7
+ubuntu@2001:400:a100:3010:f816:3eff:fe6f:f182 # (UE/RAN node) @ SALT
+ubuntu@2001:400:a100:3010:f816:3eff:fe90:9d65 # (Data Network node) @ SALT
 ```
 
 **Group B:**
 ```bash
-ubuntu@2001:400:a100:3020:f816:3eff:feb4:ceb2 # (UE/RAN node)
-ubuntu@2001:400:a100:3020:f816:3eff:fef8:6210 # (Data Network node)
+# Slice name: L25GC-e974aa0d
+ubuntu@2001:400:a100:3050:f816:3eff:fec8:5f50 # (UE/RAN node) @ ATLA
+ubuntu@2001:400:a100:3050:f816:3eff:fe71:29e3 # (Data Network node) @ ATLA
 ```
 
 **Group C:**
 ```bash
-ubuntu@2001:400:a100:3020:f816:3eff:feb4:ceb2 # (UE/RAN node)
-ubuntu@2001:400:a100:3020:f816:3eff:fef8:6210 # (Data Network node)
+# Slice name: L25GC-8a4d46da
+ubuntu@2607:f018:110:11:f816:3eff:fef7:d57c # (UE/RAN node) @ MICH
+ubuntu@2607:f018:110:11:f816:3eff:fe7e:e127 # (Data Network node) @ MICH
 ```
 
 You will be assigned a specific group at the beginning of the tutorial.
+
+Access assigned nodes using:
+
+```bash
+ssh -i <path_to_private_key> -F <path_to_fabric_ssh_config> ubuntu@<node_address>
+
+# Example (if you use the built-in terminal on JupyterHub):
+# ssh -i /home/fabric/work/fabric_config/slice_key -F /home/fabric/work/fabric_config/ssh_config ubuntu@<node_address>
+```
+
+Where:
+
+- `<path_to_private_key>` is the path to your private SSH key (corresponding to a key registered in FABRIC Portal)
+- `<path_to_fabric_ssh_config>` is the path to your FABRIC SSH config file (typically ~/.ssh/config or a FABRIC-specific config)
+- `<node_address>` is the server IP shown above
 
 ---
 
@@ -76,14 +94,7 @@ Open **a new terminal** and SSH into your assigned UE/RAN node.
 
 After you log in, run these commands in the terminal.
 
-#### (1) Run the setup script to install UERANsim
-The **L25GC+** repository has already been cloned on the node for you. You only need to enter the repository directory and run the setup script:
-```bash
-cd ~/L25GC-plus/
-yes y | ./scripts/setup.sh ue
-```
-
-#### (2) Add the L3 Route to DN server
+#### (1) Add the L3 Route to DN server
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the **UERAN node**, add a route so that traffic destined for the DN server is sent through the **UPF-U's N3 interface**:
@@ -96,7 +107,7 @@ Specifically:
 * use the **DN node N6 IP** (`192.168.3.2`) as the destination IP
 * use the **CN node N3 IP** (`192.168.2.2`) as the next-hop (`via`) IP
 
-#### (3) Configure UERANsim
+#### (2) Configure UERANsim
 > This step updates the UERANsim gNB configuration so that the simulated gNB uses the correct **N2** and **N3** interface IP addresses and can connect to the **AMF** and **UPF-U** in the core network. These settings must match the actual network configuration of your assigned cluster.
 
 The UERANsim gNB configuration file is located at:
@@ -133,14 +144,7 @@ Open **a new terminal** and SSH into your assigned DN node.
 
 After you log in, run these commands in the terminal.
 
-#### (1) Run the setup script to install iperf3
-The **L25GC+** repository has already been cloned on the node for you. You only need to enter the repository directory and run the setup script:
-```bash
-cd ~/L25GC-plus/
-yes y | ./scripts/setup.sh dn
-```
-
-#### (2) Add the L3 Route to UE
+#### (1) Add the L3 Route to UE
 > Since the UE and DN are in different L3 subnets, both the UERAN node and the DN node need static routes so that traffic is forwarded through the UPF-U.
 
 On the **DN node**, add a route so that reply traffic to the UE IP is sent through the UPF-U N6 interface.
