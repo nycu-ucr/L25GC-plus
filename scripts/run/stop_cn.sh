@@ -2,7 +2,7 @@
 set -e
 
 # Define regex patterns to match relevant NF and client/server processes
-NF_PROCESSES="(mgr|amf|nrf|ausf|udm|udr|pcf|nssf|smf|chf|upf)"
+NF_PROCESSES="(mgr|amf|nrf|ausf|udm|udr|pcf|nssf|smf|chf|upf|host_agent)"
 # SIMPLE_PROCESSES="(./server|./client)"
 # HTTP_PROCESSES="(./http_server|./http_client)"
 # TP_PROCESSES="(./tp_server|./tp_client)"

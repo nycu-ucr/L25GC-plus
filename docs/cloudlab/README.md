@@ -30,7 +30,38 @@ Following this guide, you can bring up L25GC+, run **UERANSIM** for end-to-end v
     ./scripts/setup.sh <ue|cn|dn>
     ```
 
-2. NIC interface on `CN` node must be bound to a [compatible DPDK driver](https://core.dpdk.org/supported/nics/) (e.g., `igb_uio`).  
+2. If you plan to run the `host_agent` NF on the `CN` node, install the DOCA host packages before rerunning `./scripts/setup.sh cn`.
+
+    Install prerequisite packages:
+    ```bash
+    export DEBIAN_FRONTEND=noninteractive
+    sudo -E apt-get update
+    sudo -E apt-get install -y build-essential python3-pip net-tools python3-scapy pv meson ninja-build libjson-c-dev sshpass
+    ```
+
+    Install the DOCA repository package:
+    ```bash
+    # Ubuntu 22.04
+    wget https://www.mellanox.com/downloads/DOCA/DOCA_v3.3.0/host/doca-host_3.3.0-088000-26.01-ubuntu2204_amd64.deb
+    sudo dpkg -i doca-host_3.3.0-088000-26.01-ubuntu2204_amd64.deb
+
+    # Ubuntu 24.04
+    # wget https://www.mellanox.com/downloads/DOCA/DOCA_v3.3.0/host/doca-host_3.3.0-088000-26.01-ubuntu2404_amd64.deb
+    # sudo dpkg -i doca-host_3.3.0-088000-26.01-ubuntu2404_amd64.deb
+    ```
+
+    Install the DOCA SDK:
+    ```bash
+    sudo apt-get update
+    sudo apt-get -y install doca-all
+    ```
+
+    Then rerun:
+    ```bash
+    ./scripts/setup.sh cn
+    ```
+
+3. NIC interface on `CN` node must be bound to a [compatible DPDK driver](https://core.dpdk.org/supported/nics/) (e.g., `igb_uio`).  
     > *Note:* In some environments, the interface must be brought down before binding.
 
     ```bash
@@ -57,7 +88,20 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```bash
     ./scripts/run/run_upf_c.sh 2 ./NFs/onvm-upf/5gc/upf_c/config/upfcfg.yaml
     ```
-4. **Run Control Plane NFs** (new terminal)
+4. **Run host_agent** (new terminal)
+    Edit the Host Agent config first:
+    ```bash
+    vi ./NFs/onvm-upf/5gc/host_agent/config/host_agent.yaml
+    ```
+    Set:
+    - `pci_addr` to the BF3 PF PCI address on the CN host
+    - `server_name` to the Comch server name exposed by the DPU agent
+
+    Then launch:
+    ```bash
+    ./scripts/run/run_host_agent.sh 14 ./NFs/onvm-upf/5gc/host_agent/config/host_agent.yaml
+    ```
+5. **Run Control Plane NFs** (new terminal)
     ```bash
     source ~/.bashrc
     ./scripts/run/run_cp_nfs.sh && reset && tail -f log/*.log
@@ -70,7 +114,7 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```bash
     reset
     ```
-5. **Run Webconsole** (new terminal)
+6. **Run Webconsole** (new terminal)
     > The webconsole is used to pre-store UE info in MongoDB for authentication and configure QoS.
     ```bash
     cd webconsole/ 
@@ -78,7 +122,7 @@ You can use our provided [scripts](scripts/run/) to launch onvm_mgr and L25GC+ N
     ```
     See this [video]() or [doc](../../docs/webconsole/README.md) for usage instructions.
 
-6. **Stop L25GC+**
+7. **Stop L25GC+**
     ```bash
     ./scripts/run/stop_cn.sh
     ```

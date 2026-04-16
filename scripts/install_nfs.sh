@@ -47,8 +47,17 @@ echo -e "${YELLOW}Build and install DPDK, go1.21, igb_uio${NC}"
 # Source .bashrc to make Go env active
 source ~/.bashrc
 
-# Building ONVM, UPF-U, and UPF-C
+# Building ONVM, UPF-U, UPF-C, and host_agent
 ./scripts/build.sh
+
+HOST_AGENT_BIN="$HOME/L25GC-plus/NFs/onvm-upf/build/5gc/l25gc_host_agent"
+if [ -f "$HOST_AGENT_BIN" ]; then
+    echo -e "${GREEN}host_agent build detected:${NC} $HOST_AGENT_BIN"
+else
+    echo -e "${YELLOW}host_agent was not built.${NC}"
+    echo "Install DOCA host packages on the CN node, then rerun ./scripts/setup.sh cn"
+    echo "or rebuild manually from ~/L25GC-plus/NFs/onvm-upf with ./scripts/build.sh"
+fi
 
 # ------------------------------------------------------------------------------
 # Setup Environment Variables
