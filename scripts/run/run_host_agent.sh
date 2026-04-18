@@ -83,7 +83,7 @@ elif [[ $dash_dash_cnt -eq 0 ]]; then
     fi
 
     DPDK_ARGS="-l $DEFAULT_CORE_ID $DPDK_BASE_ARGS"
-    ONVM_ARGS="-r $service"
+    ONVM_ARGS="-r $service -m"
 elif [[ $dash_dash_cnt -eq 1 ]]; then
     echo "ERROR: This script requires either 0 or 2 '--' separators"
     usage
