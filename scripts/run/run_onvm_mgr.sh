@@ -45,7 +45,9 @@ ensure_hugepages() {
 
   echo "[INFO] Hugepages not ready (total=$hp_total free=$hp_free). Reserving ${DEFAULT_ONVM_NUM_HUGEPAGES} pages and mounting /mnt/huge"
   export ONVM_NUM_HUGEPAGES="$DEFAULT_ONVM_NUM_HUGEPAGES"
-  . ./scripts/dpdk_helper_scripts.sh
+  # the helper lives in the onvm-upf submodule; resolve it from this script's location
+  local _repo_root; _repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+  . "$_repo_root/NFs/onvm-upf/scripts/dpdk_helper_scripts.sh"
   set_numa_pages
 }
 
