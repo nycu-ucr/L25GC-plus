@@ -21,7 +21,7 @@
 [submodule "NFs/smf"]
 	path = NFs/smf
 	url = https://github.com/nycu-ucr/smf.git
-	branch = feat/nr-dc
+	branch = dev/william/nrdc
 [submodule "NFs/udm"]
 	path = NFs/udm
 	url = https://github.com/nycu-ucr/udm.git
@@ -37,6 +37,7 @@
 [submodule "onvm-upf"]
 	path = NFs/onvm-upf
 	url = https://github.com/nycu-ucr/onvm-upf.git
+	branch = dev/william/nr-dc
 [submodule "xio"]
 	path = NFs/xio
 	url = https://github.com/nycu-ucr/onvmpoller.git
@@ -46,3 +47,6 @@
 [submodule "UERANSIM"]
 	path = UERANSIM
 	url = https://github.com/aligungr/UERANSIM.git
+[submodule "free-ran-ue"]
+	path = free-ran-ue
+	url = https://github.com/williamlin0518/free-ran-ue.git

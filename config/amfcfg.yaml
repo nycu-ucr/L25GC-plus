@@ -5,7 +5,8 @@ info:
 configuration:
   amfName: AMF # the name of this AMF
   ngapIpList:  # the IP list of N2 interfaces on this AMF
-    - 127.0.0.18
+    - 192.168.20.2      # master gNB N2 (enp10s0)
+    - 192.168.30.2      # secondary gNB N2 (enp8s0)
   ngapPort: 38412 # the SCTP port listened by NGAP
 
   # Service-based Interface (SBI) Configuration
