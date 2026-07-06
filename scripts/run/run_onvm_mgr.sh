@@ -18,6 +18,7 @@ DEFAULT_ONVM_MGR_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf"
 DEFAULT_PORTMASK="3"
 DEFAULT_NF_COREMASK="0xFFF8"
 DEFAULT_OUTPUT="stdout"
+DEFAULT_ONVM_NUM_HUGEPAGES="${ONVM_NUM_HUGEPAGES:-1024}"
 
 # Usage function
 usage() {
@@ -30,6 +31,22 @@ usage() {
   echo "                     Example: 0xF0 -> cores 4-7 for NFs"
   echo "  -s OUTPUT          Stats/output mode (web|stdout) (default: $DEFAULT_OUTPUT)"
   exit 1
+}
+
+ensure_hugepages() {
+  local hp_total hp_free
+  hp_total=$(awk '/HugePages_Total/ {print $2}' /proc/meminfo)
+  hp_free=$(awk '/HugePages_Free/ {print $2}' /proc/meminfo)
+
+  if [ "$hp_total" -gt 0 ] && grep -qs '/mnt/huge' /proc/mounts; then
+    echo "[INFO] Hugepages already configured: total=$hp_total free=$hp_free"
+    return 0
+  fi
+
+  echo "[INFO] Hugepages not ready (total=$hp_total free=$hp_free). Reserving ${DEFAULT_ONVM_NUM_HUGEPAGES} pages and mounting /mnt/huge"
+  export ONVM_NUM_HUGEPAGES="$DEFAULT_ONVM_NUM_HUGEPAGES"
+  . ./scripts/dpdk_helper_scripts.sh
+  set_numa_pages
 }
 
 # Parse input arguments
@@ -59,6 +76,9 @@ fi
 
 echo "[INFO] Changing directory to: $ONVM_MGR_PATH"
 cd "$ONVM_MGR_PATH"
+
+# Make sure DPDK has hugepages before trying to start the primary process.
+ensure_hugepages
 
 # Small delay to ensure environment is ready
 sleep 1.0

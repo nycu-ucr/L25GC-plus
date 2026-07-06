@@ -29,12 +29,15 @@ if [ "$#" -lt 2 ]; then
     usage
 fi
 
-# Set working directory and default UPF-U path
-WORK_DIR=$HOME
-DEFAULT_UPF_U_PATH="$WORK_DIR/L25GC-plus/NFs/onvm-upf/build/5gc/l25gc_upf_u"
+# Resolve the repo root from the script location instead of $HOME.
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+REPO_ROOT=$(cd -- "$SCRIPT_DIR/../.." && pwd)
+DEFAULT_UPF_U_PATH="$REPO_ROOT/NFs/onvm-upf/build/5gc/l25gc_upf_u"
 
 # Default DPDK args
-DPDK_BASE_ARGS="-n 3 --proc-type=secondary"
+# Match the primary process --allow list to suppress mlx5 probe errors on non-whitelisted NICs
+ALLOW_LIST="${ONVM_ALLOW_LIST:---allow 0000:07:00.0 --allow 0000:0b:00.0}"
+DPDK_BASE_ARGS="-n 3 --proc-type=secondary ${ALLOW_LIST}"
 DEFAULT_CORE_ID=3
 
 # Verify the NF binary exists
